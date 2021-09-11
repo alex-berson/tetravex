@@ -1,0 +1,227 @@
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url(../fonts/RobotoSlab-Regular-webfont.woff);
+}
+
+@font-face {
+    font-family: 'Roboto Slab';
+    src: url(../fonts/RobotoSlab-Bold-webfont.woff);
+    font-weight: bold;
+}
+
+:root {
+    --board-size: 85vmin;
+
+    --color1: #cf0000;
+    --color2: #fb7900;
+    --color3: #f0d400;
+    --color4: #74d218;
+    --color5: #2d68a0;
+    --color6: #74517b;
+    --color7: #bd7d11;
+    --color8: #bdbeb6;
+    --color9: #000000;
+    --color10: #ffffff;
+
+
+    --triangle1: #000000;
+    --triangle2: #000000;
+    --triangle3: #000000;
+    --triangle4: #000000;
+    --triangle5: #000000;
+    --triangle6: #000000;
+    --triangle7: #000000;
+    --triangle8: #000000;
+    --triangle9: #000000;
+    --triangle10: #000000;
+    --triangle11: #000000;
+    --triangle12: #000000;
+    --triangle13: #000000;
+    --triangle14: #000000;
+    --triangle15: #000000;
+    --triangle16: #000000;
+    --triangle17: #000000;
+    --triangle18: #000000;
+    --triangle19: #000000;
+    --triangle20: #000000;
+    --triangle21: #000000;
+    --triangle22: #000000;
+    --triangle23: #000000;
+    --triangle24: #000000;
+    --triangle25: #000000;
+    --triangle26: #000000;
+    --triangle27: #000000;
+    --triangle28: #000000;
+    --triangle29: #000000;
+    --triangle30: #000000;
+    --triangle31: #000000;
+    --triangle32: #000000;
+    --triangle33: #000000;
+    --triangle34: #000000;
+    --triangle35: #000000;
+    --triangle36: #000000;
+}
+
+body{
+    font-family: 'Roboto Slab', serif;
+    margin: 0px;
+    transition: opacity 2s ease;
+    opacity: 0;
+    background: #eeeeee;
+}
+
+#outer {
+    display: table;
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+}
+  
+#middle {
+    display: table-cell;
+    vertical-align: middle;
+}
+  
+#inner {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+h1{
+    text-align: center;
+    font-size: 22vw;
+    margin-top: 0px;
+}
+
+/* .char:nth-of-type(1){
+    color: #000000;
+}
+.char:nth-of-type(2){
+    color: #000000;
+}
+.char:nth-of-type(3){
+    color: #000000;
+}
+.char:nth-of-type(4){
+    color: #000000;
+}
+.char:nth-of-type(5){
+    color: #000000;
+}
+.char:nth-of-type(6){
+    color: #000000;
+}
+.char:nth-of-type(7){
+    color: #000000;
+}
+.char:nth-of-type(8){
+    color: #000000;
+}
+.char:nth-of-type(9){
+    color: #000000;
+} */
+
+.board{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(33.33%, 1fr));
+    padding: 1px;
+    border: 10px solid gray;
+    width: var(--board-size);
+    height: var(--board-size);
+    margin: auto;
+}
+
+.tile{
+    position: relative;
+    margin: 1px;
+
+    border-style: solid;
+    border-width: calc(var(--board-size) / 6 - 1px );
+    height: 0;
+    width: 0;
+    /* margin: auto; */
+}
+
+.tile:nth-of-type(1){
+    border-color: var(--triangle1) var(--triangle2) var(--triangle3) var(--triangle4);
+}
+.tile:nth-of-type(2){
+    border-color: var(--triangle5) var(--triangle6) var(--triangle7) var(--triangle8);
+}
+.tile:nth-of-type(3){
+    border-color: var(--triangle9) var(--triangle10) var(--triangle11) var(--triangle12);
+}
+.tile:nth-of-type(4){
+    border-color: var(--triangle13) var(--triangle14) var(--triangle15) var(--triangle16);
+}
+.tile:nth-of-type(5){
+    border-color: var(--triangle17) var(--triangle18) var(--triangle19) var(--triangle20);
+}
+.tile:nth-of-type(6){
+    border-color: var(--triangle21) var(--triangle22) var(--triangle23) var(--triangle24);
+}
+.tile:nth-of-type(7){
+    border-color: var(--triangle25) var(--triangle26) var(--triangle27) var(--triangle28);
+}
+.tile:nth-of-type(8){
+    border-color: var(--triangle29) var(--triangle30) var(--triangle31) var(--triangle32);
+}
+.tile:nth-of-type(9){
+    border-color: var(--triangle22) var(--triangle34) var(--triangle35) var(--triangle26);
+}
+
+#designed{
+    text-align: center;
+    align-self: auto;
+    color: white;
+    font-size: 0.43em; 
+    margin-top: -1.3em;
+
+}
+
+.tile:hover{
+      cursor: pointer;
+}
+
+@media (orientation: landscape) and (max-height: 460px){
+    h1{
+        display: none;
+    }
+}
+
+@media (min-width: 460px) and (min-height: 460px){
+    h1{
+        font-size: 6.4em;
+    }
+    .board{
+        padding: 2px;
+        border: 20px solid var(--darkBrown);
+        border-radius: 10px;
+        width: 400px;
+        height: 400px;
+        margin-top: auto; 
+        margin-bottom: 20;
+    }
+    .tile{
+        margin: 2px;
+        font-size: 40px;
+        padding: 21px 10px 10px 10px; 
+    }
+
+    #designed{
+        font-size: 0.85em; 
+        margin-top: -1.4em;
+    }
+}
+
+.noselect {
+-webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+        -webkit-user-select: none; 
+           -moz-user-select: none; 
+            -ms-user-select: none; 
+                user-select: none; 
+}
+ 
