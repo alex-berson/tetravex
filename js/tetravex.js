@@ -1,18 +1,12 @@
+const showBoard = () => document.querySelector("body").style.opacity = 1;
+
+const random = (n) => Math.floor(Math.random() * n);
+
+const shuffle = ([...arr]) => arr.map((a) => [Math.random(),a]).sort((a,b) => a[0]-b[0]).map((a) => a[1]);
+
 const disableTapZoom = () => {
     const preventDefault = (e) => e.preventDefault();
     document.body.addEventListener('touchstart', preventDefault, {passive: false});
-}
-
-const showBoard = () => {
-    document.querySelector("body").style.opacity = 1;
-}
-
-const random = (n) => {
-    return Math.floor(Math.random() * n);
-}
-
-const shuffle = (arr) => {
-    return arr.map((a) => [Math.random(),a]).sort((a,b) => a[0]-b[0]).map((a) => a[1]);
 }
 
 const headerColors = () => {
@@ -48,12 +42,63 @@ const boardColors = () => {
     }
 }
 
+const wellShuffled = (arr) => {
+
+    let n = Math.sqrt(arr.length);
+
+    console.log(n);
+
+    if (arr.some((item, index) => item == index)) return false;
+
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n - 1; j++) {
+            if (arr[i * n + j + 1] - arr[i * n + j] == 1) return false;
+            if (arr[i + j * n + n] - arr[i + j * n] == n) return false;
+        }
+    }
+
+    return true;
+}
+
+const shuffleTiles = () => {
+
+    let order = [0,1,2,3,4,5,6,7,8];
+
+    console.log(order);
+
+    do {
+
+        order = shuffle(order);
+    
+    }while(!wellShuffled(order));
+
+    console.log(wellShuffled(order));
+
+    console.log(order);
+
+    let tiles = document.querySelectorAll('.tile');
+
+    for (let tile of tiles) {
+        tile.classList.add("shuffle");
+    }
+
+    for (let [i, tile] of tiles.entries()) {
+
+        let destinationTile = tiles[order.indexOf(i)];
+        let offsetLeft =  destinationTile.offsetLeft - tile.offsetLeft;
+        let offsetTop = destinationTile.offsetTop - tile.offsetTop;
+
+        tile.style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+    }
+}
+
 const init = () => {
 
     disableTapZoom();
     showBoard();
     headerColors();
     boardColors();
+    setTimeout(shuffleTiles, 1500);
 }
 
 window.onload = () => {
