@@ -21,15 +21,54 @@ const headerColors = () => {
     }
 }
 
+const singleTriangles = (n) => {
+
+    let triangles = [];
+
+    for (let i = 0; i < n; i++) {
+        triangles.push(i * 4);
+        triangles.push((n - 1) * n * 4 + 2 + i * 4);
+        triangles.push(3 + i * n * 4);
+        triangles.push(n * 4 - 3 + i * n * 4);
+    }
+
+    return triangles;
+}
+
+const doubleTriangles = (n) => {
+
+    let triangles = [];
+
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n; j++) {
+            triangles.push([2 + j * 4 + i * n * 4, n * 4 + j * 4 + i * n * 4]);
+            triangles.push([1 + j * 4 * n + i * 4, 7 + j * 4 * n + i * 4]);
+        }
+    }
+
+    return triangles;
+}
+
 const boardColors = () => {
 
-    let singles = [0,3,4,8,9,15,21,26,27,30,33,34];
-    let doubles = [[1,7],[2,12],[5,11],[6,16],[10,20],[13,19],[14,24],[17,23],[18,28],[22,32],[25,31],[29,35]];
+    // let singles = [0,3,4,8,9,15,21,26,27,30,33,34];
+    // let doubles = [[1,7],[2,12],[5,11],[6,16],[10,20],[13,19],[14,24],[17,23],[18,28],[22,32],[25,31],[29,35]];
+
+    let singles = singleTriangles(3);
+    let doubles = doubleTriangles(3);
     let colors = [0,1,2,3,4,5,6,7,8,9];
+
+    // console.log(singles);
+    // console.log(singles2(3));
+
+    console.log(doubles);
+
+    // console.log(doubles2(3));
+
 
     colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
 
-    console.log(colors);
+    // console.log(colors);
 
     for (let single of singles) {
         document.documentElement.style.setProperty(`--triangle${single + 1}`, `var(--color${colors.shift() + 1})`);
@@ -44,9 +83,9 @@ const boardColors = () => {
 
 const wellShuffled = (arr) => {
 
-    let n = Math.sqrt(arr.length);
+    const n = Math.sqrt(arr.length);
 
-    console.log(n);
+    // console.log(n);
 
     if (arr.some((item, index) => item == index)) return false;
 
@@ -64,7 +103,7 @@ const shuffleTiles = () => {
 
     let order = [0,1,2,3,4,5,6,7,8];
 
-    console.log(order);
+    // console.log(order);
 
     do {
 
@@ -72,9 +111,9 @@ const shuffleTiles = () => {
     
     }while(!wellShuffled(order));
 
-    console.log(wellShuffled(order));
+    // console.log(wellShuffled(order));
 
-    console.log(order);
+    // console.log(order);
 
     let tiles = document.querySelectorAll('.tile');
 
