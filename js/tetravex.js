@@ -57,28 +57,38 @@ const boardColors = () => {
     let singles = singleTriangles(3);
     let doubles = doubleTriangles(3);
     let colors = [0,1,2,3,4,5,6,7,8,9];
+    let triangles = [];
 
-    // console.log(singles);
-    // console.log(singles2(3));
-
-    console.log(doubles);
-
-    // console.log(doubles2(3));
-
+    let tiles = document.querySelectorAll('.tile');
 
     colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
 
-    // console.log(colors);
 
     for (let single of singles) {
-        document.documentElement.style.setProperty(`--triangle${single + 1}`, `var(--color${colors.shift() + 1})`);
+        
+        let color = colors.shift();
+
+        triangles[single] = color;
+
+        // document.documentElement.style.setProperty(`--triangle${single + 1}`, `var(--color${color + 1})`);
     }
 
     for (let double of doubles) {
+
         let color = colors.shift();
-        document.documentElement.style.setProperty(`--triangle${double[0] + 1}`, `var(--color${color + 1})`);
-        document.documentElement.style.setProperty(`--triangle${double[1] + 1}`, `var(--color${color + 1})`);
+
+        triangles[double[0]] = color;
+        triangles[double[1]] = color;
+
+        // document.documentElement.style.setProperty(`--triangle${double[0] + 1}`, `var(--color${color + 1})`);
+        // document.documentElement.style.setProperty(`--triangle${double[1] + 1}`, `var(--color${color + 1})`);
     }
+
+    for (let [i, tile] of tiles.entries()) {
+        tile.style.borderColor = `var(--color${triangles[i * 4] + 1}) var(--color${triangles[i * 4 + 1] + 1}) var(--color${triangles[i * 4 + 2] + 1}) var(--color${triangles[i * 4 + 3] + 1})`
+    }
+
+    console.log(triangles);
 }
 
 const wellShuffled = (arr) => {
@@ -137,7 +147,7 @@ const init = () => {
     showBoard();
     headerColors();
     boardColors();
-    setTimeout(shuffleTiles, 1500);
+    // setTimeout(shuffleTiles, 1500);
 }
 
 window.onload = () => {

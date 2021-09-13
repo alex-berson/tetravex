@@ -24,7 +24,7 @@
     --color10: #ffffff;
 
 
-    --triangle1: #000000;
+    /* --triangle1: #000000;
     --triangle2: #000000;
     --triangle3: #000000;
     --triangle4: #000000;
@@ -59,7 +59,7 @@
     --triangle33: #000000;
     --triangle34: #000000;
     --triangle35: #000000;
-    --triangle36: #000000;
+    --triangle36: #000000; */
 }
 
 body{
@@ -121,7 +121,7 @@ h1{
     transition: all 1s ease-in-out;
 }
 
-.tile:nth-of-type(1){
+/* .tile:nth-of-type(1){
     border-color: var(--triangle1) var(--triangle2) var(--triangle3) var(--triangle4);
 }
 .tile:nth-of-type(2){
@@ -147,7 +147,7 @@ h1{
 }
 .tile:nth-of-type(9){
     border-color: var(--triangle33) var(--triangle34) var(--triangle35) var(--triangle36);
-}
+} */
 
 #designed{
     text-align: center;
