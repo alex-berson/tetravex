@@ -1,3 +1,5 @@
+let x, y, x0, y0;
+
 const showBoard = () => document.querySelector("body").style.opacity = 1;
 
 const random = (n) => Math.floor(Math.random() * n);
@@ -7,6 +9,17 @@ const shuffle = ([...arr]) => arr.map((a) => [Math.random(),a]).sort((a,b) => a[
 const disableTapZoom = () => {
     const preventDefault = (e) => e.preventDefault();
     document.body.addEventListener('touchstart', preventDefault, {passive: false});
+}
+
+const setBoardSize = (n) => {
+
+    if (screen.height > screen.width) {
+         var boardSize = Math.ceil(screen.width * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / n) * n;
+    } else {
+         var boardSize = Math.ceil(window.innerHeight * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / n) * n;
+    }
+
+    document.documentElement.style.setProperty('--board-size', boardSize + 'px');
 }
 
 const headerColors = () => {
@@ -49,7 +62,7 @@ const doubleTriangles = (n) => {
     return triangles;
 }
 
-const boardColors = () => {
+const tilesColors = () => {
 
     // let singles = [0,3,4,8,9,15,21,26,27,30,33,34];
     // let doubles = [[1,7],[2,12],[5,11],[6,16],[10,20],[13,19],[14,24],[17,23],[18,28],[22,32],[25,31],[29,35]];
@@ -65,7 +78,7 @@ const boardColors = () => {
 
 
     for (let single of singles) {
-        
+
         let color = colors.shift();
 
         triangles[single] = color;
@@ -88,7 +101,7 @@ const boardColors = () => {
         tile.style.borderColor = `var(--color${triangles[i * 4] + 1}) var(--color${triangles[i * 4 + 1] + 1}) var(--color${triangles[i * 4 + 2] + 1}) var(--color${triangles[i * 4 + 3] + 1})`
     }
 
-    console.log(triangles);
+    // console.log(triangles);
 }
 
 const wellShuffled = (arr) => {
@@ -97,7 +110,11 @@ const wellShuffled = (arr) => {
 
     // console.log(n);
 
-    if (arr.some((item, index) => item == index)) return false;
+    for (let i = 0; i < arr.length; i++){
+        if (arr[i] == i) return false;
+    }
+
+    // if (arr.some((item, index) => item == index)) return false;
 
     for (let i = 0; i < n; i++) {
         for (let j = 0; j < n - 1; j++) {
@@ -109,21 +126,21 @@ const wellShuffled = (arr) => {
     return true;
 }
 
+const shuffleTilesEnd = (e) => {
+
+    let tile = e.currentTarget;
+
+    tile.classList.remove("shuffle");
+    tile.removeEventListener('transitionend', shuffleTilesEnd);
+}
+
 const shuffleTiles = () => {
 
-    let order = [0,1,2,3,4,5,6,7,8];
-
-    // console.log(order);
+    let tilesOrder = [0,1,2,3,4,5,6,7,8];
 
     do {
-
-        order = shuffle(order);
-    
-    }while(!wellShuffled(order));
-
-    // console.log(wellShuffled(order));
-
-    // console.log(order);
+        tilesOrder = shuffle(tilesOrder);
+    } while(!wellShuffled(tilesOrder));
 
     let tiles = document.querySelectorAll('.tile');
 
@@ -133,21 +150,111 @@ const shuffleTiles = () => {
 
     for (let [i, tile] of tiles.entries()) {
 
-        let destinationTile = tiles[order.indexOf(i)];
+        let destinationTile = tiles[tilesOrder.indexOf(i)];
         let offsetLeft =  destinationTile.offsetLeft - tile.offsetLeft;
         let offsetTop = destinationTile.offsetTop - tile.offsetTop;
 
         tile.style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+        tile.addEventListener('transitionend', shuffleTilesEnd);
     }
+}
+
+const startMove = (e) => {
+
+    const tile = e.currentTarget;
+
+    if (e.type === "touchstart") {
+        x = x0 = e.touches[0].clientX;
+        y = y0 = e.touches[0].clientY;
+    } else {
+        x = x0 = e.clientX
+        y = y0 = e.clientY
+    }
+
+    disableTouch();
+    tile.classList.add("move");
+    tile.addEventListener('touchmove', move);
+    tile.addEventListener('touchend', endMove);
+    tile.addEventListener('mousemove', move);
+    tile.addEventListener('mouseup', endMove);
+}
+
+const move = (e) => {
+
+    let dx, dy;
+    let tile = e.currentTarget;
+    let style = window.getComputedStyle(tile);
+    let matrix = new WebKitCSSMatrix(style.transform);
+
+    if (e.type === "touchmove") {
+        dx = e.touches[0].clientX - x;
+        dy = e.touches[0].clientY - y;
+
+        x = e.touches[0].clientX;
+        y = e.touches[0].clientY;
+    } else {
+        dx = e.clientX - x;
+        dy = e.clientY - y;
+
+        x = e.clientX;
+        y = e.clientY;
+    }
+
+    tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
+}
+
+const returnEnd = (e) => {
+
+    let tile = e.currentTarget;
+
+    enableTouch();
+    tile.classList.remove("return");
+    tile.classList.remove("move");
+    tile.removeEventListener('transitionend', returnEnd);
+}
+
+const endMove = (e) => {
+
+    const tile = e.currentTarget;
+    let style = window.getComputedStyle(tile);
+    let matrix = new WebKitCSSMatrix(style.transform);
+    let event = new Event('transitionend');
+
+    tile.classList.add("return");
+    tile.removeEventListener('touchmove', move);
+    tile.removeEventListener('touchend', endMove);
+    tile.removeEventListener('mousemove', move);
+    tile.removeEventListener('mouseup', endMove);
+    tile.addEventListener('transitionend', returnEnd);
+
+    tile.style.transform = `translate(${matrix.m41 - (x - x0)}px, ${ matrix.m42 - (y - y0)}px)`;
+
+    if (x - x0 == 0 && y - y0 == 0) tile.dispatchEvent(event);
+}
+
+const disableTouch = () => {
+    document.querySelectorAll('.tile').forEach((tile) => {
+      tile.removeEventListener('touchstart', startMove);
+      tile.removeEventListener('mousedown', startMove);
+    });
+}
+
+const enableTouch = () => {
+    document.querySelectorAll('.tile').forEach((tile) => {
+      tile.addEventListener('touchstart', startMove);
+      tile.addEventListener('mousedown', startMove);
+    });
 }
 
 const init = () => {
 
-    disableTapZoom();
+    // disableTapZoom();
+    setBoardSize(3);
     showBoard();
     headerColors();
-    boardColors();
-    // setTimeout(shuffleTiles, 1500);
+    tilesColors();
+    setTimeout(shuffleTiles, 1500);
+    setTimeout(enableTouch, 2500);
 }
 
 window.onload = () => {

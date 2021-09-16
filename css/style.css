@@ -10,7 +10,7 @@
 }
 
 :root {
-    --board-size: 85vmin;
+    --board-size: 0.85;
 
     --color1: #cf0000;
     --color2: #fb7900;
@@ -68,6 +68,7 @@ body{
     transition: opacity 2s ease;
     opacity: 0;
     /* background: gainsboro; */
+    touch-action: none;
 }
 
 #outer {
@@ -107,18 +108,23 @@ h1{
 }
 
 .tile{
-    position: relative;
+    /* position: relative; */
     margin: 1px;
 
     border-style: solid;
-    border-width: calc(var(--board-size) / 6 - 1px );
+    border-width: calc(var(--board-size) / 6 - 1px);
     height: 0;
     width: 0;
+    /* cursor: move; */
     /* margin: auto; */
 }
 
 .shuffle{
     transition: all 1s ease-in-out;
+}
+
+.return{
+    transition: all 0.2s ease-in-out;
 }
 
 /* .tile:nth-of-type(1){
@@ -162,13 +168,23 @@ h1{
       cursor: pointer;
 }
 
-@media (orientation: landscape) and (max-height: 460px){
+.move {
+    z-index: 100;
+}
+
+@media (orientation: landscape) {
     h1{
         display: none;
     }
 }
 
-@media (min-width: 460px) and (min-height: 460px){
+/* @media (orientation: landscape) and (max-height: 460px){
+    h1{
+        display: none;
+    }
+} */
+
+/* @media (min-width: 460px) and (min-height: 460px){
     h1{
         font-size: 6.4em;
     }
@@ -191,7 +207,7 @@ h1{
         font-size: 0.85em; 
         margin-top: -1.4em;
     }
-}
+} */
 
 .noselect {
 -webkit-tap-highlight-color: transparent;
