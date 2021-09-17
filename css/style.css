@@ -68,7 +68,7 @@ body{
     transition: opacity 2s ease;
     opacity: 0;
     /* background: gainsboro; */
-    touch-action: none;
+    /* touch-action: none; */
 }
 
 #outer {
@@ -125,6 +125,11 @@ h1{
 
 .return{
     transition: all 0.2s ease-in-out;
+}
+
+.swap{
+    transition: all 0.2s ease-in-out;
+    z-index: 90;
 }
 
 /* .tile:nth-of-type(1){
