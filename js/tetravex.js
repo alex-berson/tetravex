@@ -223,13 +223,19 @@ const move = (e) => {
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 }
 
-const win = () => {
+const win = (e) => {
 
-    document.querySelectorAll('.tile').forEach((tile, i) => {
+    let tile = e.currentTarget;
+    let tiles =  document.querySelectorAll('.tile');
 
-        if (tile.id = i) console.log(i);
+    tile.removeEventListener('transitionend', win);
 
-    });
+    for (let [i, tile] of tiles.entries()) {
+        if (tile.id != i + 1) return false;
+    }
+
+    console.log("winner")
+    return true;
 }
 
 const swapEnd = (e) => {
@@ -240,8 +246,6 @@ const swapEnd = (e) => {
     tile.classList.remove("swap", "move");
     // tile.classList.remove("move");
     tile.removeEventListener('transitionend', swapEnd);
-    // win();
-
 }
 
 const getSwapTile = (movingTile) => {
@@ -290,6 +294,8 @@ const endMove = (e) => {
 
         swapTile.classList.add("swap");
         swapTile.addEventListener('transitionend', swapEnd);
+        swapTile.addEventListener('transitionend', win);
+
 
         swapID(tile, swapTile);
 
