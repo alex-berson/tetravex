@@ -1,4 +1,4 @@
-let x, y, x0, y0, rect0;
+let x, y, x0, y0, rect; 
 
 const showBoard = () => document.querySelector("body").style.opacity = 1;
 
@@ -62,20 +62,30 @@ const doubleTriangles = (n) => {
     return triangles;
 }
 
-const tilesColors = () => {
+const tilesColors = (n) => {
 
     // let singles = [0,3,4,8,9,15,21,26,27,30,33,34];
     // let doubles = [[1,7],[2,12],[5,11],[6,16],[10,20],[13,19],[14,24],[17,23],[18,28],[22,32],[25,31],[29,35]];
 
-    let singles = singleTriangles(3);
-    let doubles = doubleTriangles(3);
+    let singles = singleTriangles(n);
+    let doubles = doubleTriangles(n);
     let colors = [0,1,2,3,4,5,6,7,8,9];
     let triangles = [];
 
+    let colorsLength = singles.length + doubles.length;
+
     let tiles = document.querySelectorAll('.tile');
 
-    colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
+    for (let i = 0; i < Math.floor(colorsLength / colors.length); i++) {
 
+        colors  = colors.concat(colors);
+    }
+
+    colors = shuffle(colors.concat(shuffle(colors).slice(0,Math.floor(colorsLength % colors.length))));
+
+    // console.log(colors);
+    
+    // colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
 
     for (let single of singles) {
 
@@ -139,18 +149,15 @@ const swapID = (tile1, tile2) => {
     temp = tile1.id;
     tile1.id = tile2.id;
     tile2.id = temp;
-
-    // console.log(tile1);
-
-    // console.log(tile2)
-
-
 }
 
-const shuffleTiles = () => {
+const shuffleTiles = (n) => {
 
-    let tilesOrder = [0,1,2,3,4,5,6,7,8];
-    let temp;
+    // let tilesOrder = [0,1,2,3,4,5,6,7,8];
+
+    let tilesOrder = Array.from({length: n * n}, (_, i) => i);
+
+    // let temp;
 
     do {
         tilesOrder = shuffle(tilesOrder);
@@ -162,7 +169,7 @@ const shuffleTiles = () => {
     //     tile.classList.add("shuffle");
     // }
 
-    console.log(tilesOrder);
+    // console.log(tilesOrder);
 
     for (let [i, tile] of tiles.entries()) {
 
@@ -181,7 +188,7 @@ const shuffleTiles = () => {
 const startMove = (e) => {
 
     const tile = e.currentTarget;
-    rect0 = tile.getBoundingClientRect();
+    rect = tile.getBoundingClientRect();
 
     if (e.type === "touchstart") {
         x = x0 = e.touches[0].clientX;
@@ -244,7 +251,6 @@ const swapEnd = (e) => {
 
     enableTouch();
     tile.classList.remove("swap", "move");
-    // tile.classList.remove("move");
     tile.removeEventListener('transitionend', swapEnd);
 }
 
@@ -282,26 +288,27 @@ const endMove = (e) => {
     tile.removeEventListener('mouseup', endMove);
     tile.addEventListener('transitionend', swapEnd);
 
-    if (!swapTile) {
-        tile.style.transform = `translate(${matrix.m41 - (x - x0)}px, ${ matrix.m42 - (y - y0)}px)`;
-    } else {
-
+    if (swapTile) {
+        
         let rectSwap = swapTile.getBoundingClientRect();
         let style = window.getComputedStyle(swapTile);
         let matrix2 = new WebKitCSSMatrix(style.transform);
-        let offsetLeft =  rect0.left - rectSwap.left;
-        let offsetTop = rect0.top - rectSwap.top;
+        let offsetLeft =  rect.left - rectSwap.left;
+        let offsetTop = rect.top - rectSwap.top;
 
         swapTile.classList.add("swap");
         swapTile.addEventListener('transitionend', swapEnd);
         swapTile.addEventListener('transitionend', win);
 
-
         swapID(tile, swapTile);
 
         tile.style.transform = `translate(${matrix.m41 - (x - x0) - offsetLeft}px, ${ matrix.m42 - (y - y0) - offsetTop}px)`;
         swapTile.style.transform = `translate(${matrix2.m41 + offsetLeft}px, ${ matrix2.m42 + offsetTop}px)`;
+
+        return;
     }
+
+    tile.style.transform = `translate(${matrix.m41 - (x - x0)}px, ${ matrix.m42 - (y - y0)}px)`;
 
     if (x == x0 && y == y0) tile.dispatchEvent(event);
 }
@@ -320,13 +327,19 @@ const enableTouch = () => {
     });
 }
 
+const getDimetsion = () => {
+    return getComputedStyle(document.documentElement).getPropertyValue('--dimension');
+}
+
 const init = () => {
 
+    let n = getDimetsion();
+
     disableTapZoom();
-    setBoardSize(3);
+    setBoardSize(n);
     headerColors();
-    tilesColors();
-    shuffleTiles();
+    tilesColors(n);
+    shuffleTiles(n);
     showBoard();
     setTimeout(enableTouch, 1000);
 }

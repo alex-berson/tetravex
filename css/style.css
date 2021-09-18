@@ -10,6 +10,7 @@
 }
 
 :root {
+    --dimension: 4;
     --board-size: 0.85;
 
     --color1: #cf0000;
@@ -98,7 +99,10 @@ h1{
 
 .board{
     display: grid;
-    grid-template-columns: repeat(3, minmax(33.33%, 1fr));
+    grid-template-columns: repeat(var(--dimension), minmax(calc(1 / var(--dimension) * 100%), 1fr));
+
+    /* grid-template-columns: repeat(4, minmax(25%, 1fr)); */
+
     padding: 1px;
     border: 10px solid darkgrey;
     background-color: gainsboro;
@@ -112,7 +116,7 @@ h1{
     margin: 1px;
 
     border-style: solid;
-    border-width: calc(var(--board-size) / 6 - 1px);
+    border-width: calc(var(--board-size) / calc(var(--dimension) * 2) - 1px);
     height: 0;
     width: 0;
     /* cursor: move; */
