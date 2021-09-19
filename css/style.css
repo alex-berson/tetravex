@@ -13,6 +13,8 @@
     --dimension: 4;
     --board-size: 0.85;
 
+    /* --tile-size: 0; */
+
     --color1: #cf0000;
     --color2: #fb7900;
     --color3: #f0d400;
@@ -23,6 +25,7 @@
     --color8: #bdbeb6;
     --color9: #000000;
     --color10: #ffffff;
+
 
 
     /* --triangle1: #000000;
@@ -101,11 +104,13 @@ h1{
     display: grid;
     grid-template-columns: repeat(var(--dimension), minmax(calc(1 / var(--dimension) * 100%), 1fr));
 
-    /* grid-template-columns: repeat(4, minmax(25%, 1fr)); */
+    /* grid-template-columns: repeat(var(--dimension), 1fr); */
 
     padding: 1px;
     border: 10px solid darkgrey;
-    background-color: gainsboro;
+    /* background-color: gainsboro; */
+    background-color: #eaeaea;
+
     width: var(--board-size);
     height: var(--board-size);
     margin: auto;
@@ -117,10 +122,28 @@ h1{
 
     border-style: solid;
     border-width: calc(var(--board-size) / calc(var(--dimension) * 2) - 1px);
+
+    /* border-width: var(--tile-size); */
+
+
     height: 0;
     width: 0;
     /* cursor: move; */
     /* margin: auto; */
+}
+
+.win-tile {
+    margin: 0;
+    border-width: calc(var(--board-size) / calc(var(--dimension) * 2));
+    transition: 0.2s margin, 0.2s border;
+}
+
+.win-board {
+    padding: 0;
+    width: calc(var(--board-size) - 2px);
+    height: calc(var(--board-size) - 2px);
+    border-width: 12px;
+    transition: 0.2s padding, 0.2s width, 0.2s height, 0.2s border;
 }
 
 .shuffle{

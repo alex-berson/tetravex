@@ -13,18 +13,31 @@ const disableTapZoom = () => {
 
 const setBoardSize = (n) => {
 
+
     if (screen.height > screen.width) {
-         var boardSize = Math.ceil(screen.width * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / n) * n;
+         var boardSize = Math.ceil(screen.width * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / (n * 2)) * (n * 2);
     } else {
-         var boardSize = Math.ceil(window.innerHeight * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / n) * n;
+         var boardSize = Math.ceil(window.innerHeight * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / (n * 2)) * (n * 2);
     }
 
+    // alert(boardSize);
+
+    // alert(boardSize / n / 2);
+
     document.documentElement.style.setProperty('--board-size', boardSize + 'px');
+
+    document.documentElement.style.setProperty('--tile-size', boardSize / n / 2 - 1 + 'px');
+
+
+
 }
 
 const headerColors = () => {
 
     let colors = [0,1,2,3,4,5,6,7,8];
+
+    // let colors = [0,1,2,3,4,5];
+
     const chars = document.querySelectorAll(".char");
 
     colors = shuffle(colors);
@@ -70,6 +83,8 @@ const tilesColors = (n) => {
     let singles = singleTriangles(n);
     let doubles = doubleTriangles(n);
     let colors = [0,1,2,3,4,5,6,7,8,9];
+    // let colors = [0,1,2,3,4,5];
+
     let triangles = [];
 
     let colorsLength = singles.length + doubles.length;
@@ -230,6 +245,15 @@ const move = (e) => {
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 }
 
+const freezeBiard = () => {
+
+    document.querySelector(".board").classList.add("win-board");
+
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.classList.add("win-tile");
+    })
+}
+
 const win = (e) => {
 
     let tile = e.currentTarget;
@@ -240,6 +264,8 @@ const win = (e) => {
     for (let [i, tile] of tiles.entries()) {
         if (tile.id != i + 1) return false;
     }
+
+    freezeBiard();
 
     console.log("winner")
     return true;
@@ -327,13 +353,13 @@ const enableTouch = () => {
     });
 }
 
-const getDimetsion = () => {
+const getDimension = () => {
     return getComputedStyle(document.documentElement).getPropertyValue('--dimension');
 }
 
 const init = () => {
 
-    let n = getDimetsion();
+    let n = getDimension();
 
     disableTapZoom();
     setBoardSize(n);
