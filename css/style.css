@@ -114,6 +114,9 @@ h1{
     width: var(--board-size);
     height: var(--board-size);
     margin: auto;
+
+    /* transition: 0.2s padding, 0.2s width, 0.2s height, 0.2s border; */
+
 }
 
 .tile{
@@ -130,6 +133,9 @@ h1{
     width: 0;
     /* cursor: move; */
     /* margin: auto; */
+
+    /* transition: 0.2s margin, 0.2s border; */
+
 }
 
 .win-tile {

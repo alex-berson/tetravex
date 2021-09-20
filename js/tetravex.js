@@ -27,9 +27,6 @@ const setBoardSize = (n) => {
     document.documentElement.style.setProperty('--board-size', boardSize + 'px');
 
     document.documentElement.style.setProperty('--tile-size', boardSize / n / 2 - 1 + 'px');
-
-
-
 }
 
 const headerColors = () => {
@@ -245,33 +242,66 @@ const move = (e) => {
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 }
 
-const freezeBiard = () => {
+const reset = (e) => {
 
-    document.querySelector(".board").classList.add("win-board");
+    let n = getDimension();
 
+    document.querySelector(".board").removeEventListener("touchstart", reset);
+    document.querySelector(".board").removeEventListener("mousedown", reset);
+
+    console.log("reset");
+
+    // e.stopPropagation();
+
+    document.querySelector(".board").classList.remove("win-board");
     document.querySelectorAll(".tile").forEach(tile => {
-        tile.classList.add("win-tile");
-    })
+        tile.classList.remove("win-tile");
+    });
+    
+    headerColors();
+    tilesColors(n);
+    shuffleTiles(n);
+    enableTouch();
 }
 
-const win = (e) => {
+const freezeBoard = (e) => {
+
+    // console.log("frreze");
+
 
     let tile = e.currentTarget;
-    let tiles =  document.querySelectorAll('.tile');
 
-    tile.removeEventListener('transitionend', win);
+    disableTouch();
+
+    tile.removeEventListener('transitionend', freezeBoard);
+    document.querySelector(".board").addEventListener("touchstart", reset);
+    document.querySelector(".board").addEventListener("mousedown", reset);
+
+    document.querySelector(".board").classList.add("win-board");
+    document.querySelectorAll(".tile").forEach(tile => {
+        tile.classList.add("win-tile");
+    });
+
+}
+
+const win = () => {
+
+
+    // let tile = e.currentTarget;
+    let tiles = document.querySelectorAll('.tile');
+
+    // tile.removeEventListener('transitionend', win);
 
     for (let [i, tile] of tiles.entries()) {
         if (tile.id != i + 1) return false;
     }
 
-    freezeBiard();
-
-    console.log("winner")
     return true;
 }
 
 const swapEnd = (e) => {
+
+    // console.log("swapend");
 
     let tile = e.currentTarget;
 
@@ -324,9 +354,10 @@ const endMove = (e) => {
 
         swapTile.classList.add("swap");
         swapTile.addEventListener('transitionend', swapEnd);
-        swapTile.addEventListener('transitionend', win);
 
         swapID(tile, swapTile);
+
+        if (win()) swapTile.addEventListener('transitionend', freezeBoard);
 
         tile.style.transform = `translate(${matrix.m41 - (x - x0) - offsetLeft}px, ${ matrix.m42 - (y - y0) - offsetTop}px)`;
         swapTile.style.transform = `translate(${matrix2.m41 + offsetLeft}px, ${ matrix2.m42 + offsetTop}px)`;
