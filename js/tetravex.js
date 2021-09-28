@@ -199,6 +199,12 @@ const shuffleTiles = (n) => {
 
 const startMove = (e) => {
 
+    // console.log("START MOVE")
+
+    if (win()) return;
+
+    disableTouch();
+
     const tile = e.currentTarget;
     rect = tile.getBoundingClientRect();
 
@@ -210,7 +216,6 @@ const startMove = (e) => {
         y = y0 = e.clientY
     }
 
-    disableTouch();
     tile.classList.add("move");
     tile.addEventListener('touchmove', move);
     tile.addEventListener('touchend', endMove);
@@ -239,10 +244,13 @@ const move = (e) => {
         y = e.clientY;
     }
 
+    // tile.style.transform = `translate(${Math.round(matrix.m41 + dx)}px, ${Math.round(matrix.m42 + dy)}px)`;
+
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
+
 }
 
-const reset = (e) => {
+const reset = () => {
 
     let n = getDimension();
 
@@ -265,9 +273,6 @@ const reset = (e) => {
 }
 
 const freezeBoard = (e) => {
-
-    // console.log("frreze");
-
 
     let tile = e.currentTarget;
 
@@ -336,6 +341,7 @@ const endMove = (e) => {
     let matrix = new WebKitCSSMatrix(style.transform);
     let event = new Event('transitionend');
     let swapTile = getSwapTile(tile);
+    let rectTile = tile.getBoundingClientRect();
 
     tile.classList.add("swap");
     tile.removeEventListener('touchmove', move);
@@ -359,18 +365,27 @@ const endMove = (e) => {
 
         if (win()) swapTile.addEventListener('transitionend', freezeBoard);
 
-        tile.style.transform = `translate(${matrix.m41 - (x - x0) - offsetLeft}px, ${ matrix.m42 - (y - y0) - offsetTop}px)`;
-        swapTile.style.transform = `translate(${matrix2.m41 + offsetLeft}px, ${ matrix2.m42 + offsetTop}px)`;
+        // swapTile.addEventListener('transitionend', freezeBoard);
+
+
+        // tile.style.transform = `translate(${Math.round(matrix.m41 - (x - x0) - offsetLeft)}px, ${Math.round(matrix.m42 - (y - y0) - offsetTop)}px)`;
+        tile.style.transform = `translate(${Math.round(matrix.m41 - (rectTile.left - rect.left) - offsetLeft)}px, ${Math.round(matrix.m42 - (rectTile.top - rect.top) - offsetTop)}px)`;
+
+        swapTile.style.transform = `translate(${Math.round(matrix2.m41 + offsetLeft)}px, ${Math.round(matrix2.m42 + offsetTop)}px)`;
 
         return;
     }
 
-    tile.style.transform = `translate(${matrix.m41 - (x - x0)}px, ${ matrix.m42 - (y - y0)}px)`;
+    tile.style.transform = `translate(${Math.round(matrix.m41 - (rectTile.left - rect.left))}px, ${Math.round(matrix.m42 - (rectTile.top - rect.top))}px)`;
+    // tile.style.transform = `translate(${Math.round(matrix.m41 - (x - x0))}px, ${Math.round(matrix.m42 - (y - y0))}px)`;
 
     if (x == x0 && y == y0) tile.dispatchEvent(event);
 }
 
 const disableTouch = () => {
+
+    // console.log("SIDABLE")
+
     document.querySelectorAll('.tile').forEach((tile) => {
       tile.removeEventListener('touchstart', startMove);
       tile.removeEventListener('mousedown', startMove);
@@ -398,6 +413,12 @@ const init = () => {
     tilesColors(n);
     shuffleTiles(n);
     showBoard();
+
+    
+
+    // setTimeout(freezeBoard, 1200);
+
+
     setTimeout(enableTouch, 1000);
 }
 
