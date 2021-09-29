@@ -201,7 +201,11 @@ const startMove = (e) => {
 
     // console.log("START MOVE")
 
+    let n = 0;
+
     if (win()) return;
+
+    while (e.currentTarget != e.touches[n].target) n++;
 
     disableTouch();
 
@@ -209,8 +213,8 @@ const startMove = (e) => {
     rect = tile.getBoundingClientRect();
 
     if (e.type === "touchstart") {
-        x = x0 = e.touches[0].clientX;
-        y = y0 = e.touches[0].clientY;
+        x = x0 = e.touches[n].clientX;
+        y = y0 = e.touches[n].clientY;
     } else {
         x = x0 = e.clientX
         y = y0 = e.clientY
@@ -225,17 +229,23 @@ const startMove = (e) => {
 
 const move = (e) => {
 
+    let n = 0;
     let dx, dy;
     let tile = e.currentTarget;
     let style = window.getComputedStyle(tile);
     let matrix = new WebKitCSSMatrix(style.transform);
 
-    if (e.type === "touchmove") {
-        dx = e.touches[0].clientX - x;
-        dy = e.touches[0].clientY - y;
+    while (e.currentTarget != e.touches[n].target) n++;
 
-        x = e.touches[0].clientX;
-        y = e.touches[0].clientY;
+    if (e.type === "touchmove") {
+
+        // if (Math.abs(e.touches[0].clientX - x) > 30 ||  Math.abs(e.touches[0].clientY - y) > 30) return;  
+
+        dx = e.touches[n].clientX - x;
+        dy = e.touches[n].clientY - y;
+
+        x = e.touches[n].clientX;
+        y = e.touches[n].clientY;
     } else {
         dx = e.clientX - x;
         dy = e.clientY - y;
