@@ -130,17 +130,23 @@ h1{
 }
 
 .shuffle{
-    transition: all 1s ease-in-out;
+    transition: all 1s linear;
 }
 
 .return{
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s linear;
 }
 
 .swap{
-    transition: all 0.2s ease-in-out;
+    transition: all 0.2s linear;
+    /* transition: all 0.4s linear; */
     z-index: 90;
 }
+
+/* .slide{
+    transition: all 0.5s linear;
+    z-index: 100;
+} */
 
 #designed{
     text-align: center;

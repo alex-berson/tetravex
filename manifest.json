@@ -1,0 +1,19 @@
+{
+   "name": "15 Puzzle",
+   "short_name": "15 Puzzle",
+   "start_url": "index.html",
+   "display": "standalone",
+   "background_color": "#FFFFFF",
+   "theme_color": "#FFFFFF",
+   "icons": [{
+      "src": "images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+   },
+   {
+      "src": "images/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+   ]
+}

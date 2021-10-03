@@ -38,6 +38,10 @@ const headerColors = () => {
     const chars = document.querySelectorAll(".char");
 
     colors = shuffle(colors);
+
+    // colors = [0,4,6,3,2,5,7,1];
+
+    console.log("HEADER: ", colors);
     
     for (let char of chars) {
         char.style.color = `var(--color${colors.shift() + 1})`;
@@ -89,13 +93,12 @@ const tilesColors = (n) => {
     let tiles = document.querySelectorAll('.tile');
 
     for (let i = 0; i < Math.floor(colorsLength / colors.length); i++) {
-
         colors  = colors.concat(colors);
     }
 
     colors = shuffle(colors.concat(shuffle(colors).slice(0,Math.floor(colorsLength % colors.length))));
 
-    // console.log(colors);
+    console.log("TILES: ", colors);
     
     // colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
 
@@ -181,7 +184,7 @@ const shuffleTiles = (n) => {
     //     tile.classList.add("shuffle");
     // }
 
-    // console.log(tilesOrder);
+    console.log("ORDER: ", tilesOrder);
 
     for (let [i, tile] of tiles.entries()) {
 
@@ -189,7 +192,7 @@ const shuffleTiles = (n) => {
         let offsetLeft =  destinationTile.offsetLeft - tile.offsetLeft;
         let offsetTop = destinationTile.offsetTop - tile.offsetTop;
 
-        tile.id = tilesOrder.indexOf(i) + 1;
+        tile.id = `t${tilesOrder.indexOf(i) + 1}`;
 
         // tile.classList.add("shuffle");
         tile.style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
@@ -308,7 +311,7 @@ const win = () => {
     // tile.removeEventListener('transitionend', win);
 
     for (let [i, tile] of tiles.entries()) {
-        if (tile.id != i + 1) return false;
+        if (parseInt(tile.id.substring(1)) != i + 1) return false;
     }
 
     return true;
@@ -322,6 +325,10 @@ const swapEnd = (e) => {
 
     enableTouch();
     tile.classList.remove("swap", "move");
+
+    // tile.style.transition = "";
+    // tile.style.zIndex = "auto";
+
     tile.removeEventListener('transitionend', swapEnd);
 }
 
@@ -369,6 +376,16 @@ const endMove = (e) => {
         let offsetTop = rect.top - rectSwap.top;
 
         swapTile.classList.add("swap");
+
+
+        // let dist = distance(parseInt(tile.id.substring(1)) - 1, parseInt(swapTile.id.substring(1)) - 1) / 10 + 0.2;
+
+        // console.log(dist);
+
+        // swapTile.style.transition = `all ${dist}s linear`;
+        // swapTile.style.zIndex = 90;
+
+
         swapTile.addEventListener('transitionend', swapEnd);
 
         swapID(tile, swapTile);
@@ -393,9 +410,6 @@ const endMove = (e) => {
 }
 
 const disableTouch = () => {
-
-    // console.log("SIDABLE")
-
     document.querySelectorAll('.tile').forEach((tile) => {
       tile.removeEventListener('touchstart', startMove);
       tile.removeEventListener('mousedown', startMove);
@@ -413,9 +427,26 @@ const getDimension = () => {
     return getComputedStyle(document.documentElement).getPropertyValue('--dimension');
 }
 
+setServiceWorker = () => {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('service-worker.js')
+                .then(reg => {
+                    console.log('Service worker registered!', reg);
+                })
+                .catch(err => {
+                    console.log('Service worker registration failed: ', err);
+                });
+        });
+    } 
+}
+
 const init = () => {
 
     let n = getDimension();
+
+    setServiceWorker();
+
 
     disableTapZoom();
     setBoardSize(n);
@@ -430,6 +461,10 @@ const init = () => {
 
 
     setTimeout(enableTouch, 1000);
+
+
+    // setTimeout(preview, 1500);
+
 }
 
 window.onload = () => {
