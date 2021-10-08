@@ -15,16 +15,16 @@
 
     /* --tile-size: 0; */
 
-    --color1: #cf0000;
-    --color2: #fb7900;
-    --color3: #f0d400;
-    --color4: #74d218;
-    --color5: #2d68a0;
-    --color6: #74517b;
-    --color7: #bd7d11;
-    --color8: #bdbeb6;
-    --color9: #000000;
-    --color10: #ffffff;
+    --color0: #cf0000;
+    --color1: #fb7900;
+    --color2: #f0d400;
+    --color3: #74d218;
+    --color4: #2d68a0;
+    --color5: #74517b;
+    --color6: #bd7d11;
+    --color7: #bdbeb6;
+    --color8: #000000;
+    --color9: #ffffff;
 }
 
 body{
@@ -112,6 +112,8 @@ h1{
     /* margin: auto; */
 
     /* transition: 0.2s margin, 0.2s border; */
+
+    border-left-color: red;
 
 }
 
@@ -214,6 +216,6 @@ h1{
     -webkit-user-select: none; 
     -moz-user-select: none; 
     -ms-user-select: none; 
-    user-select: none; ƒ
+     user-select: none;
 }
  

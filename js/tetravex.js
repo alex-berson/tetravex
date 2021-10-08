@@ -2,7 +2,7 @@ let x, y, x0, y0, rect;
 
 const showBoard = () => document.querySelector("body").style.opacity = 1;
 
-const random = (n) => Math.floor(Math.random() * n);
+// const random = (n) => Math.floor(Math.random() * n);
 
 const shuffle = ([...arr]) => arr.map((a) => [Math.random(),a]).sort((a,b) => a[0]-b[0]).map((a) => a[1]);
 
@@ -12,7 +12,6 @@ const disableTapZoom = () => {
 }
 
 const setBoardSize = (n) => {
-
 
     if (screen.height > screen.width) {
          var boardSize = Math.ceil(screen.width * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / (n * 2)) * (n * 2);
@@ -44,7 +43,7 @@ const headerColors = () => {
     console.log("HEADER: ", colors);
     
     for (let char of chars) {
-        char.style.color = `var(--color${colors.shift() + 1})`;
+        char.style.color = `var(--color${colors.shift()})`;
     }
 }
 
@@ -84,12 +83,8 @@ const tilesColors = (n) => {
     let singles = singleTriangles(n);
     let doubles = doubleTriangles(n);
     let colors = [0,1,2,3,4,5,6,7,8,9];
-    // let colors = [0,1,2,3,4,5];
-
     let triangles = [];
-
     let colorsLength = singles.length + doubles.length;
-
     let tiles = document.querySelectorAll('.tile');
 
     for (let i = 0; i < Math.floor(colorsLength / colors.length); i++) {
@@ -123,7 +118,7 @@ const tilesColors = (n) => {
     }
 
     for (let [i, tile] of tiles.entries()) {
-        tile.style.borderColor = `var(--color${triangles[i * 4] + 1}) var(--color${triangles[i * 4 + 1] + 1}) var(--color${triangles[i * 4 + 2] + 1}) var(--color${triangles[i * 4 + 3] + 1})`
+        tile.style.borderColor = `var(--color${triangles[i * 4]}) var(--color${triangles[i * 4 + 1]}) var(--color${triangles[i * 4 + 2]}) var(--color${triangles[i * 4 + 3]})`
     }
 
     // console.log(triangles);
@@ -161,7 +156,7 @@ const wellShuffled = (arr) => {
 
 const swapID = (tile1, tile2) => {
 
-    temp = tile1.id;
+    let temp = tile1.id;
     tile1.id = tile2.id;
     tile2.id = temp;
 }
@@ -204,11 +199,11 @@ const startMove = (e) => {
 
     // console.log("START MOVE")
 
-    let n = 0;
+    // let n = 0;
 
     if (win()) return;
 
-    while (e.currentTarget != e.touches[n].target) n++;
+    // while (e.currentTarget != e.touches[n].target) n++;
 
     disableTouch();
 
@@ -216,6 +211,10 @@ const startMove = (e) => {
     rect = tile.getBoundingClientRect();
 
     if (e.type === "touchstart") {
+        let n = 0;
+
+        while (e.currentTarget != e.touches[n].target) n++;
+
         x = x0 = e.touches[n].clientX;
         y = y0 = e.touches[n].clientY;
     } else {
@@ -228,19 +227,24 @@ const startMove = (e) => {
     tile.addEventListener('touchend', endMove);
     tile.addEventListener('mousemove', move);
     tile.addEventListener('mouseup', endMove);
+    tile.addEventListener("mouseleave", endMove);
 }
 
 const move = (e) => {
 
-    let n = 0;
+    // let n = 0;
     let dx, dy;
     let tile = e.currentTarget;
     let style = window.getComputedStyle(tile);
     let matrix = new WebKitCSSMatrix(style.transform);
 
-    while (e.currentTarget != e.touches[n].target) n++;
+    // while (e.currentTarget != e.touches[n].target) n++;
 
     if (e.type === "touchmove") {
+
+        let n = 0;
+        
+        while (e.currentTarget != e.touches[n].target) n++;
 
         // if (Math.abs(e.touches[0].clientX - x) > 30 ||  Math.abs(e.touches[0].clientY - y) > 30) return;  
 
@@ -275,8 +279,9 @@ const reset = () => {
     // e.stopPropagation();
 
     document.querySelector(".board").classList.remove("win-board");
-    document.querySelectorAll(".tile").forEach(tile => {
+    document.querySelectorAll(".tile").forEach((tile, index) => {
         tile.classList.remove("win-tile");
+        tile.id = `t${index + 1}`;
     });
     
     headerColors();
@@ -304,15 +309,31 @@ const freezeBoard = (e) => {
 
 const win = () => {
 
-
-    // let tile = e.currentTarget;
+    let colors = [];
+    let n = getDimension();
+    let doubles = doubleTriangles(n);
     let tiles = document.querySelectorAll('.tile');
 
-    // tile.removeEventListener('transitionend', win);
+    tiles.forEach(tile => {
 
-    for (let [i, tile] of tiles.entries()) {
-        if (parseInt(tile.id.substring(1)) != i + 1) return false;
+        let id = parseInt(tile.id.substring(1));
+        let topColor = window.getComputedStyle(tile).getPropertyValue("border-top-color");
+        let rightColor = window.getComputedStyle(tile).getPropertyValue("border-right-color");
+        let bottomColor = window.getComputedStyle(tile).getPropertyValue("border-bottom-color");
+        let leftColor = window.getComputedStyle(tile).getPropertyValue("border-left-color");
+        
+        colors[id - 1] = [topColor, rightColor, bottomColor, leftColor];
+    });
+
+    colors = colors.flat();
+
+    for (let double of doubles) {
+        if (colors[double[0]] != colors[double[1]]) return false;
     }
+
+    // for (let [i, tile] of tiles.entries()) {
+    //     if (parseInt(tile.id.substring(1)) != i + 1) return false;
+    // }
 
     return true;
 }
@@ -365,6 +386,7 @@ const endMove = (e) => {
     tile.removeEventListener('touchend', endMove);
     tile.removeEventListener('mousemove', move);
     tile.removeEventListener('mouseup', endMove);
+    tile.removeEventListener("mouseleave", endMove);
     tile.addEventListener('transitionend', swapEnd);
 
     if (swapTile) {
@@ -427,7 +449,7 @@ const getDimension = () => {
     return getComputedStyle(document.documentElement).getPropertyValue('--dimension');
 }
 
-setServiceWorker = () => {
+const setServiceWorker = () => {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('service-worker.js')
@@ -446,8 +468,6 @@ const init = () => {
     let n = getDimension();
 
     setServiceWorker();
-
-
     disableTapZoom();
     setBoardSize(n);
     headerColors();
@@ -455,10 +475,7 @@ const init = () => {
     shuffleTiles(n);
     showBoard();
 
-    
-
     // setTimeout(freezeBoard, 1200);
-
 
     setTimeout(enableTouch, 1000);
 
