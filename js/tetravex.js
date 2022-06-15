@@ -1,6 +1,5 @@
-let x, y, x0, y0, matrix, rect; 
-let dragging = false;
-let size = getComputedStyle(document.documentElement).getPropertyValue('--size');
+const size = getComputedStyle(document.documentElement).getPropertyValue('--size');
+// let dragging = false;
 
 // if ('serviceWorker' in navigator) {
 //     window.addEventListener('load', () => {
@@ -14,6 +13,7 @@ let size = getComputedStyle(document.documentElement).getPropertyValue('--size')
 //     });
 // } 
 
+const touchScreen = () => matchMedia('(hover: none)').matches;
 
 const showBoard = () => document.querySelector('body').style.opacity = 1;
 
@@ -50,7 +50,10 @@ const headerColors = () => {
 
     colors = shuffle(colors);
 
-    // colors = [0,4,6,3,2,5,7,1];
+    colors = [0,4,2,3,5,6,7,1];
+
+    // colors = [0,4,2,3,1,5,7,6];
+
 
     // console.log('HEADER: ', colors);
     
@@ -92,6 +95,8 @@ const tilesColors = () => {
     // let singles = [0,3,4,8,9,15,21,26,27,30,33,34];
     // let doubles = [[1,7],[2,12],[5,11],[6,16],[10,20],[13,19],[14,24],[17,23],[18,28],[22,32],[25,31],[29,35]];
 
+    // const cells = document.querySelectorAll('.cell');
+
     const singles = singleTriangles();
     const doubles = doubleTriangles();
     // let colors = [0,1,2,3,4,5,6,7,8,9];
@@ -99,7 +104,7 @@ const tilesColors = () => {
     const colorsLength = singles.length + doubles.length;
     let tiles = document.querySelectorAll('.tile');
 
-    do {
+    // do {
         triangles = [];
         let colors = [0,1,2,3,4,5,6,7,8,9];
 
@@ -109,7 +114,7 @@ const tilesColors = () => {
 
         colors = shuffle(colors.concat(shuffle(colors).slice(0,Math.floor(colorsLength % colors.length))));
 
-        console.log('TILES: ', colors);
+        // console.log('TILES: ', colors);
         
         // colors = shuffle(colors.concat(colors).concat(shuffle(colors).slice(0,4)));
 
@@ -134,74 +139,84 @@ const tilesColors = () => {
         }
 
     // } while (adjoiningColors(triangles) || winCombinations(triangles));   //
-    } while (winCombinations(triangles));   //
+    // } while (winCombinations(triangles));   //
 
+    // triangles = [2,3,4,1,1,6,3,3,6,7,0,6,9,5,2,7,4,2,0,1,3,7,4,2,0,8,1,7,2,2,6,8,0,3,9,3,4,8,5,3,1,4,7,8,6,9,0,4,9,0,5,7,5,9,8,0,7,5,6,9,0,4,8,5];
 
-    // triangles = [9,0,6,8,1,9,3,0,3,5,3,9,8,1,9,5,6,2,6,8,3,4,7,2,3,3,4,4,9,9,6,3,6,6,0,1,7,1,0,6,4,8,0,1,6,4,5,8,0,2,2,5,0,5,7,2,0,2,4,5,5,7,7,2];
+    // triangles = [2,3,9,1,1,6,3,3,6,7,0,6,9,5,2,7,9,4,0,1,3,7,2,4,0,8,1,7,2,2,6,8,0,3,9,3,2,8,5,3,1,4,7,8,6,9,0,4,9,0,5,7,5,4,8,0,7,5,6,4,0,4,8,5];
 
+    // triangles = [4, 9, 2, 1, 6, 4, 7, 9, 9, 8, 1, 4, 0, 8, 0, 8, 2, 5, 7, 4, 7, 3, 6, 5, 1, 2, 5, 3, 0, 6, 9, 2, 7, 9, 6, 5, 6, 3, 1, 9, 5, 0, 3, 3, 9, 4, 7, 0, 6, 8, 1, 0, 1, 8, 5, 8, 3, 2, 2, 8, 7, 3, 7, 2];
+
+    // triangles = [4, 3, 5, 0, 5, 4, 1, 3, 8, 6, 0, 4, 3, 2, 8, 6, 5, 7, 5, 0, 1, 6, 6, 7, 0, 9, 8, 6, 8, 1, 3, 9, 5, 7, 2, 0, 6, 8, 9, 7, 8, 5, 1, 8, 3, 6, 7, 5, 2, 7, 1, 2, 9, 4, 3, 7, 1, 9, 4, 4, 7, 9, 2, 9];
+
+    console.log(triangles);
 
     for (let [i, tile] of tiles.entries()) {
+
+        // tile.style.top = `${cells[i].getBoundingClientRect().top}px`;
+        // tile.style.left = `${cells[i].getBoundingClientRect().left}px`;
+
+        // tile.style.opacity = 1;
+
+        // console.log(cells[i].offsetTop, cells[i].offsetLeft);
+        // console.log(tile.offsetTop, tile.getBoundingClientRect().top);
+
+
         tile.style.borderColor = `var(--color${triangles[i * 4]}) var(--color${triangles[i * 4 + 1]}) var(--color${triangles[i * 4 + 2]}) var(--color${triangles[i * 4 + 3]})`
     }
 
     // console.log(triangles);
 }
 
-const adjoiningColors = (triangles) => {
+// const adjoiningColors = (triangles) => {
 
-    for (let i = 0; i < triangles.length; i += 4) {
-        // console.log(i);
-        for (let j = 0; j < 4; j++) {
-            // console.log(i + j, i + (j + 1) % 4);
-            if ((triangles[i + j] == 3 && triangles[i + (j + 1) % 4] == 4) || (triangles[i + j] == 4 && triangles[i + (j + 1) % 4] == 3)) {
-                // console.log('TRUE');
-                return true;
-            }
-        }
-    }
+//     for (let i = 0; i < triangles.length; i += 4) {
+//         for (let j = 0; j < 4; j++) {
+//             if ((triangles[i + j] == 3 && triangles[i + (j + 1) % 4] == 4) || (triangles[i + j] == 4 && triangles[i + (j + 1) % 4] == 3)) {
+//                 return true;
+//             }
+//         }
+//     }
+//     return false;
+// }
 
-    // console.log(triangles);
-    // console.log('FALSE');
-    return false;
-}
+// const winCombinations = (triangles) => {
 
-const winCombinations = (triangles) => {
+//     const doubles = doubleTriangles();
 
-    const doubles = doubleTriangles();
+//     const trianles2d = [];
 
-    const trianles2d = [];
+//     for (let i = 0; i < triangles.length / 4; i++) {
 
-    for (let i = 0; i < triangles.length / 4; i++) {
+//         let four = [];
 
-        let four = [];
+//         for (let j = 0; j < 4; j++) {
 
-        for (let j = 0; j < 4; j++) {
+//             four.push(triangles[i * 4 + j]);
+//         }
 
-            four.push(triangles[i * 4 + j]);
-        }
+//         trianles2d.push(four);
+//     }
 
-        trianles2d.push(four);
-    }
+//     let copyTrianles2d = trianles2d.map(arr => arr.slice());
 
-    let copyTrianles2d = trianles2d.map(arr => arr.slice());
+//     for (let i = 0; i < size * size - 1; i++) {
+//         for (let j = i + 1; j < size * size; j++) {
 
-    for (let i = 0; i < size * size - 1; i++) {
-        for (let j = i + 1; j < size * size; j++) {
+//             copyTrianles2d = trianles2d.map(arr => arr.slice());
 
-            copyTrianles2d = trianles2d.map(arr => arr.slice());
-
-            [copyTrianles2d[i], copyTrianles2d[j]] = [copyTrianles2d[j], copyTrianles2d[i]];
+//             [copyTrianles2d[i], copyTrianles2d[j]] = [copyTrianles2d[j], copyTrianles2d[i]];
         
-            let triangles1d = copyTrianles2d.flat();
+//             let triangles1d = copyTrianles2d.flat();
 
-            if (doubles.some(double => triangles1d[double[0]] != triangles1d[double[1]])) continue;
+//             if (doubles.some(double => triangles1d[double[0]] != triangles1d[double[1]])) continue;
 
-            return true;
-        }
-    }
+//             return true;
+//         }
+//     }
 
-    return false;
-}
+//     return false;
+// }
 
 const wellShuffled = (arr) => {
 
@@ -242,6 +257,9 @@ const swapID = (tile1, tile2) => {
 
 const shuffleTiles = () => {
 
+    let cells = document.querySelectorAll('.cell');
+    let tiles = document.querySelectorAll('.tile');
+
     // let tilesOrder = [0,1,2,3,4,5,6,7,8];
 
     let tilesOrder = Array.from({length: size * size}, (_, i) => i);
@@ -253,40 +271,62 @@ const shuffleTiles = () => {
         tilesOrder = shuffle(tilesOrder);
     } while(!wellShuffled(tilesOrder));
 
+    // tilesOrder = [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
+
     // tilesOrder = [1,0,2,3,4,5,6,7,8,9,10,11,12,13,14,15];
 
 
-    let tiles = document.querySelectorAll('.tile');
+    // tilesOrder = [12, 2, 15, 6, 14, 0, 10, 1, 4, 7, 5, 8, 3, 9, 13, 11];
+
+    // tilesOrder = [6, 12, 15, 1, 9, 0, 13, 2, 4, 8, 7, 14, 11, 3, 5, 10];
+
+    console.log(tilesOrder);
 
     // for (let tile of tiles) {
     //     tile.classList.add('shuffle');
     // }
 
-    console.log('ORDER: ', tilesOrder);
+    // console.log('ORDER: ', tilesOrder);
 
-    for (let [i, tile] of tiles.entries()) {
+    // for (let [i, tile] of tiles.entries()) {
 
-        let destinationTile = tiles[tilesOrder.indexOf(i)];
-        let offsetLeft =  destinationTile.offsetLeft - tile.offsetLeft;
-        let offsetTop = destinationTile.offsetTop - tile.offsetTop;
+    //     let destinationTile = tiles[tilesOrder.indexOf(i)];
+    //     let offsetLeft =  destinationTile.offsetLeft - tile.offsetLeft;
+    //     let offsetTop = destinationTile.offsetTop - tile.offsetTop;
 
-        tile.id = `t${tilesOrder.indexOf(i) + 1}`;
+    //     tile.id = `t${tilesOrder.indexOf(i) + 1}`;
 
-        // tile.classList.add('shuffle');
-        tile.style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
-        // tile.addEventListener('transitionend', shuffleTilesEnd);
-    }
+    //     tile.style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+
+    // }
+
+    tilesOrder.forEach((pos, i) => {
+        tiles[pos].id = `t${i + 1}`;
+        // tiles[pos].style.top = `${cells[i].getBoundingClientRect().top}px`;
+        // tiles[pos].style.left = `${cells[i].getBoundingClientRect().left}px`;
+
+        tiles[pos].style.top = `${cells[i].offsetTop}px`;
+        tiles[pos].style.left = `${cells[i].offsetLeft}px`;
+    });
+
 }
 
 const startMove = (e) => {
     
     const tile = e.currentTarget;
 
+    // const cell = document.querySelector(`#${tile.id.replace('t', 'c')}`); //
+
+    // console.log(tile.id.replace('t', 'c'));
+
     // console.log('START MOVE')
 
     // let n = 0;
 
-    if (dragging || win()) return;
+    // if (dragging || win()) return;
+    if (win()) return;
+
+    // console.log(MouseEvent.buttons);
 
     // if (win()) return;
 
@@ -299,77 +339,124 @@ const startMove = (e) => {
     // while (e.currentTarget != e.touches[n].target) n++;
     // console.log(tile.id);
 
-    if (tile.classList.contains('swap')) return;
+    // if (tile.classList.contains('swap')) return;
 
-    dragging = true;
+    // dragging = true;
 
     tile.classList.add('move');
 
     // disableTouch();
 
-    rect = tile.getBoundingClientRect();
+    // rect = tile.getBoundingClientRect();
 
-    let style = window.getComputedStyle(tile);  //
-    matrix = new WebKitCSSMatrix(style.transform);  //
+    // const test = window.getComputedStyle(tile).transform;
+    // tile.style.transform = test;
+
+
+
+    // let style = window.getComputedStyle(tile);  //
+    // matrix = new WebKitCSSMatrix(style.transform);  //
+
+    // rect = cell.getBoundingClientRect();
+
+    // let style = window.getComputedStyle(cell);  //
+    // matrix = new WebKitCSSMatrix(style.transform);  //
 
     if (e.type === 'touchstart') {
         let n = 0;
 
         while (e.currentTarget != e.touches[n].target) n++;
 
-        x = x0 = e.touches[n].clientX;
-        y = y0 = e.touches[n].clientY;
+        tile.dataset.x0 = tile.dataset.x = e.touches[n].clientX;
+        tile.dataset.y0 = tile.dataset.y = e.touches[n].clientY;
+
+        tile.addEventListener('touchmove', touchMove);
+
+
     } else {
-        x = x0 = e.clientX
-        y = y0 = e.clientY
+
+        let tiles = document.querySelectorAll('.move');
+
+        if (tiles.length > 1) {
+            returnTile();
+            return;
+        }
+
+        tile.dataset.x0 = tile.dataset.x = e.clientX
+        tile.dataset.y0 = tile.dataset.y = e.clientY
+
+        document.addEventListener('mousemove', mouseMove);
     }
 
-    tile.addEventListener('touchmove', move);
-    tile.addEventListener('mousemove', move);
+    // tile.addEventListener('touchmove', move);
+    // tile.addEventListener('mousemove', move);
 
     tile.addEventListener('touchend', endMove);
     tile.addEventListener('touchcancel', endMove);
-    tile.addEventListener('mouseup', endMove);
-    tile.addEventListener('mouseleave', endMove);
+    document.addEventListener('mouseup', endMove);
+    // tile.addEventListener('mouseleave', endMove);
 }
 
-const move = (e) => {
+const touchMove = (e) => {
 
-    // let n = 0;
-    let dx, dy;
     let tile = e.currentTarget;
     let style = window.getComputedStyle(tile);
     let matrix = new WebKitCSSMatrix(style.transform);
 
     // while (e.currentTarget != e.touches[n].target) n++;
 
-    if (e.type === 'touchmove') {
+    let n = 0;
+    
+    while (e.currentTarget != e.touches[n].target) n++;
 
-        let n = 0;
-        
-        while (e.currentTarget != e.touches[n].target) n++;
+    // if (Math.abs(e.touches[0].clientX - x) > 30 ||  Math.abs(e.touches[0].clientY - y) > 30) return;  
 
-        // if (Math.abs(e.touches[0].clientX - x) > 30 ||  Math.abs(e.touches[0].clientY - y) > 30) return;  
+    let dx = e.touches[n].clientX - tile.dataset.x;
+    let dy = e.touches[n].clientY - tile.dataset.y;
 
-        dx = e.touches[n].clientX - x;
-        dy = e.touches[n].clientY - y;
+    // dx1 = e.touches[n].clientX - x0;
+    // dy1 = e.touches[n].clientY - y0;
 
-        x = e.touches[n].clientX;
-        y = e.touches[n].clientY;
-    } else {
-        dx = e.clientX - x;
-        dy = e.clientY - y;
-
-        x = e.clientX;
-        y = e.clientY;
-    }
-
+    tile.dataset.x = e.touches[n].clientX;
+    tile.dataset.y = e.touches[n].clientY;
+    
     // console.log(dx, dy);
 
     // tile.style.transform = `translate(${Math.round(matrix.m41 + dx)}px, ${Math.round(matrix.m42 + dy)}px)`;
 
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 
+    // let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);  
+
+
+    // tile.style.left = cell.offsetLeft + dx1 + 'px';
+    // tile.style.top = cell.offsetTop + dy1 + 'px';
+
+    // console.log(tile.id, cell.id);
+    // console.log(dx, dy);
+
+
+}
+
+const mouseMove = (e) => {
+
+    let tiles = document.querySelectorAll('.move');
+
+    if (tiles.length > 1) {
+        returnTile();
+        return;
+    }
+
+    let tile = tiles[0];
+    let style = window.getComputedStyle(tile);
+    let matrix = new WebKitCSSMatrix(style.transform);
+    let dx = e.clientX - tile.dataset.x;
+    let dy = e.clientY - tile.dataset.y;
+
+    tile.dataset.x = e.clientX;
+    tile.dataset.y = e.clientY;
+
+    tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 }
 
 const reset = () => {
@@ -384,17 +471,18 @@ const reset = () => {
     // e.stopPropagation();
 
     document.querySelector('.board').classList.remove('win-board');
+    // document.querySelector('.designed').classList.remove('win-designed');
     document.querySelectorAll('.tile').forEach((tile, index) => {
         tile.classList.remove('win-tile');
         tile.id = `t${index + 1}`;
+        tile.style.transform = ''; //
     });
     
-    dragging = false;
+    // dragging = false;
 
     headerColors();
     tilesColors();
     shuffleTiles();
-    // enableTouch();
 }
 
 const freezeBoard = (e) => {
@@ -408,6 +496,7 @@ const freezeBoard = (e) => {
     document.querySelector('.board').addEventListener('mousedown', reset);
 
     document.querySelector('.board').classList.add('win-board');
+    // document.querySelector('.designed').classList.add('win-designed');
     document.querySelectorAll('.tile').forEach(tile => {
         tile.classList.add('win-tile');
     });
@@ -453,9 +542,14 @@ const swapEnd = (e) => {
     
     tile.classList.remove('swap');
 
+    console.log("SWAPEND");
+
 }
 
 const swappedTile = (movingTile) => {
+
+    // let cell = document.querySelector(`#${tileSwap.id.replace('t', 'c')}`);
+
 
     const tiles = document.querySelectorAll('.tile');
     const rectTile = movingTile.getBoundingClientRect();
@@ -478,23 +572,36 @@ const swappedTile = (movingTile) => {
 
 const endMove = (e) => {
 
-    const tile = e.currentTarget;
+    const el = e.currentTarget;
+
+    // console.log(tile);
+
+    let tile = el != document ? el : document.querySelector('.move');
+
+    let cell1 = document.querySelector(`#${tile.id.replace('t', 'c')}`);
     let style = window.getComputedStyle(tile);
     let matrix1 = new WebKitCSSMatrix(style.transform);
     let event = new Event('transitionend');
     let tileSwap = swappedTile(tile);
     let rectTile = tile.getBoundingClientRect();
+    // let rect = cell1.getBoundingClientRect();
+    let rectCell1 = cell1.getBoundingClientRect();
+
+    // console.log(rect, rectCell1);
+
+    // let rectCell1 = rect;
+
 
     tile.classList.add('swap');
     tile.classList.remove('move'); //
 
-    tile.removeEventListener('touchmove', move);
-    tile.removeEventListener('mousemove', move);
+    tile.removeEventListener('touchmove', touchMove);
+    document.removeEventListener('mousemove', mouseMove);
 
     tile.removeEventListener('touchend', endMove);
     tile.removeEventListener('touchcancel', endMove);
-    tile.removeEventListener('mouseup', endMove);
-    tile.removeEventListener('mouseleave', endMove);
+    document.removeEventListener('mouseup', endMove);
+    // tile.removeEventListener('mouseleave', endMove);
 
     // tile.addEventListener('transitionend', (e) => {
     //     e.currentTarget.classList.remove('swap');
@@ -504,12 +611,20 @@ const endMove = (e) => {
 
 
     if (tileSwap) {
+
+        let cell2 = document.querySelector(`#${tileSwap.id.replace('t', 'c')}`);
         
-        let rectSwap = tileSwap.getBoundingClientRect();
+        // let rectSwap = tileSwap.getBoundingClientRect();
+
+        // let rectSwap = cell2.getBoundingClientRect();
+
         let style = window.getComputedStyle(tileSwap);
         let matrix2 = new WebKitCSSMatrix(style.transform);
-        let offsetLeft =  rect.left - rectSwap.left;
-        let offsetTop = rect.top - rectSwap.top;
+        // let offsetLeft =  rect.left - rectSwap.left;
+        // let offsetTop = rect.top - rectSwap.top;
+
+        let offsetLeft =  cell1.offsetLeft - cell2.offsetLeft;
+        let offsetTop = cell1.offsetTop - cell2.offsetTop;
 
         tileSwap.classList.add('swap');
         // tile.classList.remove('move'); //
@@ -537,7 +652,14 @@ const endMove = (e) => {
 
 
         // tile.style.transform = `translate(${Math.round(matrix.m41 - (x - x0) - offsetLeft)}px, ${Math.round(matrix.m42 - (y - y0) - offsetTop)}px)`;
-        tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rect.left) - offsetLeft)}px, ${Math.round(matrix1.m42 - (rectTile.top - rect.top) - offsetTop)}px)`;
+        // tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rect.left) - offsetLeft)}px, ${Math.round(matrix1.m42 - (rectTile.top - rect.top) - offsetTop)}px)`;
+
+        tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rectCell1.left) - offsetLeft)}px, ${Math.round(matrix1.m42 - (rectTile.top - rectCell1.top) - offsetTop)}px)`;
+        // tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - cell1.offsetLeft) - offsetLeft)}px, ${Math.round(matrix1.m42 - (rectTile.top - cell1.offsetTop) - offsetTop)}px)`;
+
+        // console.log(rectTile.left - rect.left, tile.offsetLeft - cell1.offsetLeft);
+        // console.log(rectTile.top - rect.top, tile.offsetTop - cell1.offsetTop);
+
 
         tileSwap.style.transform = `translate(${Math.round(matrix2.m41 + offsetLeft)}px, ${Math.round(matrix2.m42 + offsetTop)}px)`;
 
@@ -549,19 +671,24 @@ const endMove = (e) => {
             return;
         }
 
-        dragging = false;
+        // dragging = false;
 
         return;
     }
 
-    tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rect.left))}px, ${Math.round(matrix1.m42 - (rectTile.top - rect.top))}px)`;
-    // tile.style.transform = `translate(${Math.round(matrix.m41 - (x - x0))}px, ${Math.round(matrix.m42 - (y - y0))}px)`;
+    // let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);  //
+    // tile.style.left = cell.offsetLeft + 'px'; //
+    // tile.style.top = cell.offsetTop + 'px'; //
+    // tile.style.transform = '';
 
-    // setTimeout(enableTouch, 50, tile); //
+    tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rectCell1.left))}px, ${Math.round(matrix1.m42 - (rectTile.top - rectCell1.top))}px)`;
 
-    dragging = false;
+    // dragging = false;
 
-    if (x == x0 && y == y0) tile.dispatchEvent(event);
+    if (tile.dataset.x0 == tile.dataset.x && tile.dataset.y0 == tile.dataset.y) tile.dispatchEvent(event);
+
+    // if (x == x0 && y == y0) console.log( "X = X0)");
+
 
     // enableTouch(tile); //
 
@@ -570,44 +697,63 @@ const endMove = (e) => {
 const returnTile = () => {
 
     // alert('RETURN');
-    const tiles = document.querySelectorAll('.tile');
+    // const tiles = document.querySelectorAll('.tile');
 
     // let event = new Event('transitionend');
 
-    for (let tile of tiles) {
+    // for (let tile of tiles) {
 
-        if (tile.classList.contains('move')) {
+        // if (tile.classList.contains('move')) {
+            
+    document.querySelectorAll('.move').forEach(tile => {
 
-            tile.removeEventListener('touchmove', move);
-            tile.removeEventListener('mousemove', move);
+        let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);
+        let style = window.getComputedStyle(tile);
+        let matrix = new WebKitCSSMatrix(style.transform);
+        let rectTile = tile.getBoundingClientRect();
+        let rectCell = cell.getBoundingClientRect();
 
-            tile.removeEventListener('touchend', endMove);
-            tile.removeEventListener('touchcancel', endMove);
-            tile.removeEventListener('mouseup', endMove);
-            tile.removeEventListener('mouseleave', endMove);
+        tile.removeEventListener('touchmove', touchMove);
+        document.removeEventListener('mousemove', mouseMove);
 
-            // tile.addEventListener('transitionend', (e) => {
-            //     e.currentTarget.classList.remove('swap');
-            // }, {once: true});
+        tile.removeEventListener('touchend', endMove);
+        tile.removeEventListener('touchcancel', endMove);
+        document.removeEventListener('mouseup', endMove);
+        // tile.removeEventListener('mouseleave', endMove);
 
-            tile.addEventListener('transitionend', swapEnd);
+        // tile.addEventListener('transitionend', (e) => {
+        //     e.currentTarget.classList.remove('swap');
+        // }, {once: true});
 
-            tile.style.transform = `translate(${matrix.m41}px, ${matrix.m42}px`;
+        tile.addEventListener('transitionend', swapEnd);
 
-            tile.classList.remove('move');
+        // let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);
+        // let style = window.getComputedStyle(cell);
+        // let matrix = new WebKitCSSMatrix(style.transform);
 
-            tile.classList.add('swap'); //
+        // tile.style.left = cell.offsetLeft + 'px'; //
+        // tile.style.top = cell.offsetTop + 'px'; //
+        // tile.style.transform = '';
 
 
-            // enableTouch(); //
+        tile.style.transform = `translate(${Math.round(matrix.m41 - (rectTile.left - rectCell.left))}px, ${Math.round(matrix.m42 - (rectTile.top - rectCell.top))}px)`;
 
-            // setTimeout(enableTouch, 50, tile); //
 
-            dragging = false;
+        // tile.style.transform = `translate(${matrix.m41}px, ${matrix.m42}px`;
 
-            return;
-        }
-    }
+        tile.classList.remove('move');
+
+        tile.classList.add('swap'); //
+
+
+        // enableTouch(); //
+
+        // setTimeout(enableTouch, 50, tile); //
+
+        // dragging = false;
+
+        // return;
+    });
 }
 
 // const disableTouch = () => {
@@ -635,8 +781,11 @@ const enableTouch = (...args) => {
     // console.log(args);
     document.querySelectorAll('.tile').forEach((tile) => {
         // enableTouchTile(tile, args);
-      tile.addEventListener('touchstart', startMove);
-      tile.addEventListener('mousedown', startMove);
+        // if (touchScreen()) {
+            tile.addEventListener('touchstart', startMove);
+        // } else {
+            tile.addEventListener('mousedown', startMove);
+        // }
     });
 
     window.addEventListener('orientationchange', returnTile);
@@ -658,7 +807,7 @@ const init = () => {
     setTimeout(enableTouch, 500);
 
 
-    // setTimeout(preview, 1500);
+    // setTimeout(preview, 2000);
 
 }
 
