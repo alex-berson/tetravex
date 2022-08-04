@@ -399,6 +399,7 @@ const enableTouch = () => {
 const disableTapZoom = () => {
     const preventDefault = (e) => e.preventDefault();
     document.body.addEventListener('touchstart', preventDefault, {passive: false});
+    document.body.addEventListener('mousedown', preventDefault, {passive: false});
 }
 
 const init = () => {
@@ -412,4 +413,4 @@ const init = () => {
     setTimeout(enableTouch, 500);
 }
 
-window.onload = () => document.fonts.ready.then(() => init());
+window.onload = document.fonts.ready.then(init());

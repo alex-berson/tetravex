@@ -32,6 +32,10 @@ body {
     transition: opacity 2s ease;
 }
 
+body:hover {
+    cursor: default;
+}
+
 #outer {
     display: table;
     position: absolute;
@@ -171,14 +175,5 @@ h1 {
         margin: -4px;
         border-width: calc(var(--board-size-big) / calc(var(--size) * 2));
     }
-}
-
-.noselect {
-    -webkit-tap-highlight-color: transparent;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none; 
-    -moz-user-select: none; 
-    -ms-user-select: none; 
-    user-select: none;
 }
  
