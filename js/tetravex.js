@@ -1,4 +1,4 @@
-const size = getComputedStyle(document.documentElement).getPropertyValue('--size');
+const size = 4;
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -81,11 +81,11 @@ const tilesColors = () => {
     let triangles = [];
     let colors = [0,1,2,3,4,5,6,7,8,9];
 
-    for (let i = 0; i < Math.floor(colorsLength / colors.length); i++) {
+    for (let i = 0; i < Math.trunc(colorsLength / colors.length); i++) {
         colors  = colors.concat(colors);
     }
 
-    colors = shuffle(colors.concat(shuffle(colors).slice(0,Math.floor(colorsLength % colors.length))));
+    colors = shuffle(colors.concat(shuffle(colors).slice(0, Math.trunc(colorsLength % colors.length))));
 
     for (let single of singles) {
 
@@ -413,4 +413,4 @@ const init = () => {
     setTimeout(enableTouch, 500);
 }
 
-window.onload = document.fonts.ready.then(init());
+window.onload = document.fonts.ready.then(setTimeout(init, 500));
