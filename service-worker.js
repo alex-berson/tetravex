@@ -1,15 +1,14 @@
-const cacheName = 'cache-v1';
+const cacheName = 'cache-v2';
 const files = [
-  'https://alex-berson.github.io/tetravex/',
+  '/',
   'index.html',
   'css/style.css',
   'js/tetravex.js',
-  'fonts/RobotoSlab-Regular-webfont.woff',
-  'fonts/RobotoSlab-Bold-webfont.woff'
+  'fonts/roboto-slab-regular.woff',
+  'fonts/roboto-slab-bold.woff'
 ];
 
 self.addEventListener('install', event => {
-  console.log('Service worker install event!');
   event.waitUntil(
     caches.open(cacheName)
       .then(cache => {

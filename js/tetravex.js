@@ -1,49 +1,29 @@
-const size = 4;
+let size = 4;
 
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('service-worker.js')
-            .then(reg => {
-                console.log('Service worker registered!', reg);
-            })
-            .catch(err => {
-                console.log('Service worker registration failed: ', err);
-            });
-    });
-} 
-
-const touchScreen = () => matchMedia('(hover: none)').matches;
-
-const showBoard = () => document.querySelector('body').style.opacity = 1;
+const showBoard = () => document.body.style.opacity = 1;
 
 const shuffle = ([...arr]) => arr.map((a) => [Math.random(), a]).sort((a, b) => a[0] - b[0]).map((a) => a[1]);
 
 const setBoardSize = () => {
 
-    let boardSize;
-
-    if (screen.height > screen.width) {
-        boardSize = Math.ceil(screen.width * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / (size * 2)) * (size * 2);
-    } else {
-        boardSize = Math.ceil(window.innerHeight * parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / (size * 2)) * (size * 2);
-    }
+    let minSide = screen.height > screen.width ? screen.width : window.innerHeight;
+    let cssBoardSize = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--board-size')) / 100;
+    let boardSize = Math.ceil(minSide * cssBoardSize / size) * size;
 
     document.documentElement.style.setProperty('--board-size', boardSize + 'px');
 }
 
-const headerColors = () => {
+const setHeaderColors = () => {
 
-    const chars = document.querySelectorAll('.char');
-    let colors = [0,1,2,3,4,5,6,7];
-
-    colors = shuffle(colors);
+    let colors = shuffle([0,1,2,3,4,5,6,7]);
+    let chars = document.querySelectorAll('.char');
     
     for (let char of chars) {
         char.style.color = `var(--color${colors.shift()})`;
     }
 }
 
-const singleTriangles = () => {
+const getSingleTriangles = () => {
 
     let triangles = [];
 
@@ -57,7 +37,7 @@ const singleTriangles = () => {
     return triangles;
 }
 
-const doubleTriangles = () => {
+const getDoubleTriangles = () => {
 
     let triangles = [];
 
@@ -71,18 +51,17 @@ const doubleTriangles = () => {
     return triangles;
 }
 
-const tilesColors = () => {
-
-    const singles = singleTriangles();
-    const doubles = doubleTriangles();
-    const colorsLength = singles.length + doubles.length;
-    const tiles = document.querySelectorAll('.tile');
+const setTilesColors = () => {
 
     let triangles = [];
+    let singles = getSingleTriangles();
+    let doubles = getDoubleTriangles();
     let colors = [0,1,2,3,4,5,6,7,8,9];
+    let tiles = document.querySelectorAll('.tile');
+    let colorsLength = singles.length + doubles.length;
 
     for (let i = 0; i < Math.trunc(colorsLength / colors.length); i++) {
-        colors  = colors.concat(colors);
+        colors = colors.concat(colors);
     }
 
     colors = shuffle(colors.concat(shuffle(colors).slice(0, Math.trunc(colorsLength % colors.length))));
@@ -100,59 +79,64 @@ const tilesColors = () => {
 
         triangles[double[0]] = color;
         triangles[double[1]] = color;
-
     }
 
     for (let [i, tile] of tiles.entries()) {
-        tile.style.borderColor = `var(--color${triangles[i * 4]}) var(--color${triangles[i * 4 + 1]}) var(--color${triangles[i * 4 + 2]}) var(--color${triangles[i * 4 + 3]})`
+        tile.style.borderColor = `var(--color${triangles[i * 4]}) var(--color${triangles[i * 4 + 1]}) 
+                                  var(--color${triangles[i * 4 + 2]}) var(--color${triangles[i * 4 + 3]})`;
     }
-}
-
-const wellShuffled = (arr) => {
-
-    const n = Math.sqrt(arr.length);
-
-    for (let i = 0; i < arr.length; i++){
-        if (arr[i] == i) return false;
-    }
-
-    for (let i = 0; i < n; i++) {
-        for (let j = 0; j < n - 1; j++) {
-            if (arr[i * n + j + 1] - arr[i * n + j] == 1) return false;
-            if (arr[i + j * n + n] - arr[i + j * n] == n) return false;
-        }
-    }
-
-    return true;
 }
 
 const shuffleTiles = () => {
 
-    const cells = document.querySelectorAll('.cell');
-    const tiles = document.querySelectorAll('.tile');
-    let tilesOrder = Array.from({length: size * size}, (_, i) => i);
+    const wellShuffled = (arr) => {
+
+        let n = Math.sqrt(arr.length);
+    
+        for (let i = 0; i < arr.length; i++) {
+            if (arr[i] == i) return false;
+        }
+    
+        for (let i = 0; i < n; i++) {
+            for (let j = 0; j < n - 1; j++) {
+                if (arr[i * n + j + 1] - arr[i * n + j] == 1) return false;
+                if (arr[i + j * n + n] - arr[i + j * n] == n) return false;
+            }
+        }
+    
+        return true;
+    }
+
+    let cells = document.querySelectorAll('.cell');
+    let tiles = document.querySelectorAll('.tile');
+    let tilesOrder = Array.from({length: size ** 2}, (_, i) => i);
 
     do {
         tilesOrder = shuffle(tilesOrder);
-    } while(!wellShuffled(tilesOrder));
+    } while (!wellShuffled(tilesOrder));
 
     tilesOrder.forEach((pos, i) => {
-        tiles[pos].id = `t${i + 1}`;
-        tiles[pos].style.top = `${cells[i].offsetTop}px`;
-        tiles[pos].style.left = `${cells[i].offsetLeft}px`;
-    });
 
+        let rectTile = tiles[pos].getBoundingClientRect();
+        let rectCell = cells[i].getBoundingClientRect();
+        let offsetLeft = rectCell.left - rectTile.left;
+        let offsetTop = rectCell.top - rectTile.top;
+
+        tiles[pos].id = `t${i + 1}`;
+
+        tiles[pos].style.transform = `translate(${offsetLeft}px, ${offsetTop}px)`;
+    });
 }
 
 const startMove = (e) => {
     
-    const tile = e.currentTarget;
+    let tile = e.currentTarget;
 
-    if (win()) return;
+    if (gameOver()) return;
 
     tile.classList.add('move');
 
-    if (e.type === 'touchstart') {
+    if (e.type == 'touchstart') {
 
         let n = 0;
 
@@ -165,7 +149,7 @@ const startMove = (e) => {
 
     } else {
 
-        const tiles = document.querySelectorAll('.move');
+        let tiles = document.querySelectorAll('.move');
 
         if (tiles.length > 1) {
             returnTile();
@@ -187,8 +171,7 @@ const touchMove = (e) => {
 
     let tile = e.currentTarget;
     let style = window.getComputedStyle(tile);
-    let matrix = new WebKitCSSMatrix(style.transform);
-
+    let matrix = new DOMMatrix(style.transform);
     let n = 0;
     
     while (e.currentTarget != e.touches[n].target) n++;
@@ -204,7 +187,7 @@ const touchMove = (e) => {
 
 const mouseMove = (e) => {
 
-    const tiles = document.querySelectorAll('.move');
+    let tiles = document.querySelectorAll('.move');
 
     if (tiles.length > 1) {
         returnTile();
@@ -213,7 +196,7 @@ const mouseMove = (e) => {
 
     let tile = tiles[0];
     let style = window.getComputedStyle(tile);
-    let matrix = new WebKitCSSMatrix(style.transform);
+    let matrix = new DOMMatrix(style.transform);
     let dx = e.clientX - tile.dataset.x;
     let dy = e.clientY - tile.dataset.y;
 
@@ -223,45 +206,119 @@ const mouseMove = (e) => {
     tile.style.transform = `translate(${matrix.m41 + dx}px, ${matrix.m42 + dy}px)`;
 }
 
-const reset = () => {
+const getSwappedTile = (movingTile) => {
 
-    document.querySelector('.board').removeEventListener('touchstart', reset);
-    document.querySelector('.board').removeEventListener('mousedown', reset);
-    document.querySelector('.board').classList.remove('win-board');
+    let tiles = document.querySelectorAll('.tile');
+    let rectTile = movingTile.getBoundingClientRect();
+    let ox = rectTile.left + rectTile.width / 2;
+    let oy = rectTile.top + rectTile.height / 2;
 
-    document.querySelectorAll('.tile').forEach((tile, index) => {
-        tile.classList.remove('win-tile');
-        tile.id = `t${index + 1}`;
-        tile.style.transform = '';
-    });
-    
-    headerColors();
-    tilesColors();
-    shuffleTiles();
+    for (let tile of tiles) {
+
+        if (tile == movingTile || tile.classList.contains('swap')) continue;
+
+        let rectTile = tile.getBoundingClientRect();
+
+        if (ox >= rectTile.left && ox <= rectTile.right && oy >= rectTile.top && oy <= rectTile.bottom) {
+            return tile;
+        }
+    }
 }
 
-const freezeBoard = (e) => {
+const endMove = (e) => {
 
-    let tile = e.currentTarget;
+    let el = e.currentTarget;
+    let tile = el != document ? el : document.querySelector('.move');
+    let cell1 = document.querySelector(`#${tile.id.replace('t', 'c')}`);
+    let style = window.getComputedStyle(tile);
+    let matrix1 = new DOMMatrix(style.transform);
+    let event = new Event('transitionend');
+    let tileSwap = getSwappedTile(tile);
+    let rectTile = tile.getBoundingClientRect();
+    let rectCell1 = cell1.getBoundingClientRect();
 
-    tile.removeEventListener('transitionend', freezeBoard);
-    document.querySelector('.board').addEventListener('touchstart', reset);
-    document.querySelector('.board').addEventListener('mousedown', reset);
-    document.querySelector('.board').classList.add('win-board');
-    document.querySelectorAll('.tile').forEach(tile => {
-        tile.classList.add('win-tile');
+    tile.classList.add('swap');
+    tile.classList.remove('move');
+
+    tile.removeEventListener('touchmove', touchMove);
+    document.removeEventListener('mousemove', mouseMove);
+
+    tile.removeEventListener('touchend', endMove);
+    tile.removeEventListener('touchcancel', endMove);
+    document.removeEventListener('mouseup', endMove);
+
+    tile.addEventListener('transitionend', () => tile.classList.remove('swap'), {once: true});
+
+    if (tileSwap) {
+
+        let cell2 = document.querySelector(`#${tileSwap.id.replace('t', 'c')}`);
+        let rectCell2 = cell2.getBoundingClientRect();
+        let style = window.getComputedStyle(tileSwap);
+        let matrix2 = new DOMMatrix(style.transform);
+        let offsetLeft = rectCell1.left - rectCell2.left;
+        let offsetTop = rectCell1.top - rectCell2.top;
+        let tempID = tile.id;
+        
+        tile.id = tileSwap.id;
+        tileSwap.id = tempID;
+
+        tileSwap.classList.add('swap');
+
+        tileSwap.addEventListener('transitionend', () => tileSwap.classList.remove('swap'), {once: true});
+
+        tile.style.transform = `translate(${matrix1.m41 - (rectTile.left - rectCell1.left) - offsetLeft}px,
+                                          ${matrix1.m42 - (rectTile.top - rectCell1.top) - offsetTop}px)`;
+        tileSwap.style.transform = `translate(${matrix2.m41 + offsetLeft}px, ${matrix2.m42 + offsetTop}px)`;
+
+        if (gameOver()) {
+            tileSwap.addEventListener('transitionend', freezeBoard, {once: true});
+            return;
+        }
+        return;
+    }
+
+    tile.style.transform = `translate(${matrix1.m41 - (rectTile.left - rectCell1.left)}px,
+                                      ${matrix1.m42 - (rectTile.top - rectCell1.top)}px)`;
+
+    if (tile.dataset.x0 == tile.dataset.x && tile.dataset.y0 == tile.dataset.y) {
+        tile.dispatchEvent(event);
+    }
+}
+
+const returnTile = () => {
+
+    let tiles = document.querySelectorAll('.move');
+
+    tiles.forEach(tile => {
+
+        let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);
+        let style = window.getComputedStyle(tile);
+        let matrix = new DOMMatrix(style.transform);
+        let rectTile = tile.getBoundingClientRect();
+        let rectCell = cell.getBoundingClientRect();
+
+        tile.classList.remove('move');
+
+        tile.removeEventListener('touchmove', touchMove);
+        document.removeEventListener('mousemove', mouseMove);
+        tile.removeEventListener('touchend', endMove);
+        tile.removeEventListener('touchcancel', endMove);
+        document.removeEventListener('mouseup', endMove);
+
+        tile.style.transform = `translate(${matrix.m41 - (rectTile.left - rectCell.left)}px,
+                                          ${matrix.m42 - (rectTile.top - rectCell.top)}px)`;
     });
 }
 
-const win = () => {
+const gameOver = () => {
 
     let colors = [];
-    let doubles = doubleTriangles();
+    let doubles = getDoubleTriangles();
     let tiles = document.querySelectorAll('.tile');
 
     tiles.forEach(tile => {
 
-        let id = parseInt(tile.id.substring(1));
+        let id = Number(tile.id.substring(1));
         let topColor = window.getComputedStyle(tile).getPropertyValue('border-top-color');
         let rightColor = window.getComputedStyle(tile).getPropertyValue('border-right-color');
         let bottomColor = window.getComputedStyle(tile).getPropertyValue('border-bottom-color');
@@ -279,116 +336,42 @@ const win = () => {
     return true;
 }
 
-const swapEnd = (e) => {
+const freezeBoard = () => {
 
-    let tile = e.currentTarget;
+    let board = document.querySelector('.board');
+    let tiles = document.querySelectorAll('.tile');
 
-    tile.removeEventListener('transitionend', swapEnd);    
-    tile.classList.remove('swap');
+    board.addEventListener('touchstart', newGame);
+    board.addEventListener('mousedown', newGame);
+    board.classList.add('win-board');
+    tiles.forEach(tile => tile.classList.add('win-tile'));
 }
 
-const swappedTile = (movingTile) => {
+const newGame = () => {
 
-    const tiles = document.querySelectorAll('.tile');
-    const rectTile = movingTile.getBoundingClientRect();
-    const ox = rectTile.left + rectTile.width / 2;
-    const oy = rectTile.top + rectTile.height / 2;
+    let board = document.querySelector('.board');
+    let tiles = document.querySelectorAll('.tile');
 
-    for (let tile of tiles) {
+    board.removeEventListener('touchstart', newGame);
+    board.removeEventListener('mousedown', newGame);
+    board.classList.remove('win-board');
 
-        if (tile == movingTile || tile.classList.contains('swap')) continue;
-
-        const rectTile = tile.getBoundingClientRect();
-
-        if (ox >= rectTile.left && ox <= rectTile.right && oy >= rectTile.top && oy <= rectTile.bottom) {
-            return tile;
-        }
-    }
-}
-
-const swapID = (tile1, tile2) => {
-
-    let tempID = tile1.id;
-    tile1.id = tile2.id;
-    tile2.id = tempID;
-}
-
-const endMove = (e) => {
-
-    const el = e.currentTarget;
-    let tile = el != document ? el : document.querySelector('.move');
-    let cell1 = document.querySelector(`#${tile.id.replace('t', 'c')}`);
-    let style = window.getComputedStyle(tile);
-    let matrix1 = new WebKitCSSMatrix(style.transform);
-    let event = new Event('transitionend');
-    let tileSwap = swappedTile(tile);
-    let rectTile = tile.getBoundingClientRect();
-    let rectCell1 = cell1.getBoundingClientRect();
-
-    tile.classList.add('swap');
-    tile.classList.remove('move');
-
-    tile.removeEventListener('touchmove', touchMove);
-    document.removeEventListener('mousemove', mouseMove);
-
-    tile.removeEventListener('touchend', endMove);
-    tile.removeEventListener('touchcancel', endMove);
-    document.removeEventListener('mouseup', endMove);
-    tile.addEventListener('transitionend', swapEnd);
-
-
-    if (tileSwap) {
-
-        let cell2 = document.querySelector(`#${tileSwap.id.replace('t', 'c')}`);
-        let style = window.getComputedStyle(tileSwap);
-        let matrix2 = new WebKitCSSMatrix(style.transform);
-        let offsetLeft =  cell1.offsetLeft - cell2.offsetLeft;
-        let offsetTop = cell1.offsetTop - cell2.offsetTop;
-
-        tileSwap.classList.add('swap');
-        tileSwap.addEventListener('transitionend', swapEnd);
-
-        swapID(tile, tileSwap);
-
-        tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rectCell1.left) - offsetLeft)}px, ${Math.round(matrix1.m42 - (rectTile.top - rectCell1.top) - offsetTop)}px)`;
-        tileSwap.style.transform = `translate(${Math.round(matrix2.m41 + offsetLeft)}px, ${Math.round(matrix2.m42 + offsetTop)}px)`;
-
-        if (win()) {
-            tileSwap.addEventListener('transitionend', freezeBoard);
-            return;
-        }
-        return;
-    }
-
-    tile.style.transform = `translate(${Math.round(matrix1.m41 - (rectTile.left - rectCell1.left))}px, ${Math.round(matrix1.m42 - (rectTile.top - rectCell1.top))}px)`;
-
-    if (tile.dataset.x0 == tile.dataset.x && tile.dataset.y0 == tile.dataset.y) tile.dispatchEvent(event);
-}
-
-const returnTile = () => {
-            
-    document.querySelectorAll('.move').forEach(tile => {
-
-        let cell = document.querySelector(`#${tile.id.replace('t', 'c')}`);
-        let style = window.getComputedStyle(tile);
-        let matrix = new WebKitCSSMatrix(style.transform);
-        let rectTile = tile.getBoundingClientRect();
-        let rectCell = cell.getBoundingClientRect();
-
-        tile.classList.remove('move');
-
-        tile.removeEventListener('touchmove', touchMove);
-        document.removeEventListener('mousemove', mouseMove);
-        tile.removeEventListener('touchend', endMove);
-        tile.removeEventListener('touchcancel', endMove);
-        document.removeEventListener('mouseup', endMove);
-
-        tile.style.transform = `translate(${Math.round(matrix.m41 - (rectTile.left - rectCell.left))}px, ${Math.round(matrix.m42 - (rectTile.top - rectCell.top))}px)`;
+    tiles.forEach((tile, i) => {
+        tile.classList.remove('win-tile');
+        tile.id = `t${i + 1}`;
+        tile.style.removeProperty('transform');
     });
+    
+    setHeaderColors();
+    setTilesColors();
+    shuffleTiles();
 }
 
 const enableTouch = () => {
-    document.querySelectorAll('.tile').forEach((tile) => {
+
+    let tiles = document.querySelectorAll('.tile');
+
+    tiles.forEach((tile) => {
         tile.addEventListener('touchstart', startMove);
         tile.addEventListener('mousedown', startMove);
     });
@@ -397,20 +380,26 @@ const enableTouch = () => {
 }
 
 const disableTapZoom = () => {
+    
     const preventDefault = (e) => e.preventDefault();
+
     document.body.addEventListener('touchstart', preventDefault, {passive: false});
     document.body.addEventListener('mousedown', preventDefault, {passive: false});
 }
 
-const init = () => {
-
-    disableTapZoom();
-    setBoardSize();
-    headerColors();
-    tilesColors();
-    shuffleTiles();
-    showBoard();
-    setTimeout(enableTouch, 500);
+const registerServiceWorker = () => {
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('service-worker.js');
 }
 
-window.onload = document.fonts.ready.then(setTimeout(init, 500));
+const init = () => {
+    registerServiceWorker();
+    disableTapZoom();
+    setBoardSize();
+    setHeaderColors();
+    setTilesColors();
+    shuffleTiles();
+    showBoard();
+    enableTouch();
+}
+
+window.onload = () => document.fonts.ready.then(init);

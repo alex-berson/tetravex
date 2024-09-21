@@ -1,18 +1,17 @@
 @font-face {
     font-family: 'Roboto Slab';
-    src: url(../fonts/RobotoSlab-Regular-webfont.woff);
+    src: url(../fonts/roboto-slab-regular.woff);
 }
 
 @font-face {
     font-family: 'Roboto Slab';
-    src: url(../fonts/RobotoSlab-Bold-webfont.woff);
+    src: url(../fonts/roboto-slab-bold.woff);
     font-weight: bold;
 }
 
 :root {
     --size: 4;
-    --board-size: 0.85;
-    
+    --board-size: 85vmin;
     --color0: tomato;
     --color1: orange;
     --color2: gold;
@@ -22,18 +21,16 @@
     --color6: darkgoldenrod;
     --color7: silver;
     --color8: darkslategray;
-    --color9: whitesmoke; 
+    --color9: whitesmoke;
 }
 
 body {
     font-family: 'Roboto Slab', serif;
+    background-color: white;
+    overflow: hidden;
     margin: 0;
     opacity: 0;
     transition: opacity 2s ease;
-}
-
-body:hover {
-    cursor: default;
 }
 
 #outer {
@@ -44,12 +41,12 @@ body:hover {
     height: 100%;
     width: 100%;
 }
-  
+
 #middle {
     display: table-cell;
     vertical-align: middle;
 }
-  
+
 #inner {
     margin-left: auto;
     margin-right: auto;
@@ -57,49 +54,52 @@ body:hover {
 
 h1 {
     text-align: center;
-    font-size: 21.8vw;
+    font-size: calc(var(--board-size) / 3.95);
     margin-top: 0;
 }
 
 .board {
     display: grid;
     position: relative;
-    grid-template-columns: repeat(var(--size), minmax(25%, 1fr));
-    padding: 1px;
-    border: 10px solid darkgray;
-    background-color: #e9e9e9;
+    grid-template-columns: repeat(var(--size), 1fr);
     width: var(--board-size);
     height: var(--board-size);
+    background-color: #e9e9e9;
+    border-width: 10px;
+    border-style: solid;
+    border-color: darkgray;
+    padding: 1px;
     margin: auto;
 }
 
 .cell {
     position: relative;
+    height: calc(var(--board-size) / var(--size) - 2px);
+    width: calc(var(--board-size) / var(--size) - 2px);
     margin: 1px;
     opacity: 0;
-    height:  calc(var(--board-size) / var(--size) - 2px);
-    width: calc(var(--board-size) / var(--size) - 2px);
 }
 
 .tile {
     position: absolute;
-    border-style: solid;
-    border-width: calc(var(--board-size) / calc(var(--size) * 2) - 1px);
     height: 0;
     width: 0;
+    cursor: pointer;
+    border-width: calc(var(--board-size) / calc(var(--size) * 2) - 1px);
+    border-style: solid;
 }
 
 .win-board {
-    padding: 0;
     width: var(--board-size);
     height: var(--board-size);
     border-width: 11px;
+    padding: 0;
     transition: padding 0.1s, width 0.1s, height 0.1s, border 0.1s;
 }
 
 .win-tile {
-    margin: -2px;
     border-width: calc(var(--board-size) / calc(var(--size) * 2));
+    margin: -2px;
     transition: margin 0.1s, border 0.1s;
 }
 
@@ -108,27 +108,43 @@ h1 {
 }
 
 .swap {
-    transition: all 0.2s linear;
     z-index: 50;
+    transition: all 0.2s linear;
 }
 
-.designed {
+#designed {
     position: relative;
     text-align: center;
     align-self: auto;
     color: white;
-    font-size: 0.43em; 
-    margin-top: -1.3em;
-}
-
-.tile:hover {
-      cursor: pointer;
+    font-size: 9px;
+    margin-top: -12px;
 }
 
 @media (orientation: landscape) and (max-height: 460px) {
 
     h1 {
         display: none;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+
+    :root {
+        --color8: rgb(50, 50, 50);
+    }
+
+    body {
+        background-color: black;
+    }
+
+    .board {
+        background-color: rgb(20, 20, 20);
+        border-color: rgb(90, 90, 90);
+    }
+
+    #designed {
+        color: black;
     }
 }
 
@@ -139,14 +155,14 @@ h1 {
     }
 
     h1 {
-        font-size: 6.55em;
+        font-size: 104.8px;
     }
 
     .board {
-        padding: 2px;
-        border: 15px solid darkgray;
         width: var(--board-size-big);
         height: var(--board-size-big);
+        border-width: 15px;
+        padding: 2px;
     }
 
     .cell {
@@ -159,21 +175,29 @@ h1 {
         border-width: 48px;
     }
 
-    .designed {
-        font-size: 0.85em; 
-        margin-top: -1.3em;
+    #designed {
+        font-size: 13.6px;
+        margin-top: -18px;
     }
 
     .win-board {
-        padding: 0;
         width: var(--board-size-big);
         height: var(--board-size-big);
         border-width: 17px;
+        padding: 0;
     }
 
     .win-tile {
-        margin: -4px;
         border-width: calc(var(--board-size-big) / calc(var(--size) * 2));
+        margin: -4px;
     }
 }
- 
+
+.noselect {
+    -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+            -webkit-user-select: none; 
+               -moz-user-select: none; 
+                -ms-user-select: none; 
+                    user-select: none; 
+  }
